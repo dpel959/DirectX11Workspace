@@ -18,6 +18,9 @@
     <Filter Include="소스 파일\99. Headers\Unnecessary">
       <UniqueIdentifier>{dc0e7f98-77e7-4339-9290-f404a8f9c4fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\98. Shaders">
+      <UniqueIdentifier>{81d8e278-b339-4a44-981d-76bdc66cbfc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -44,6 +47,9 @@
     <ClInclude Include="Struct.h">
       <Filter>소스 파일\99. Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>소스 파일\01. Main</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX11Workspace.rc">
@@ -65,5 +71,13 @@
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일\99. Headers</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>소스 파일\01. Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Default.hlsl">
+      <Filter>소스 파일\98. Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

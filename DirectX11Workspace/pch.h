@@ -35,3 +35,6 @@ using namespace Microsoft::WRL;
 #else 
 #pragma comment(lib, "DirectXTex\\DirectXTex.lib")     // 릴리스 모드일 때는 최적화된 DirectXTex.lib 연결
 #endif
+
+// OUT define
+#define OUT
