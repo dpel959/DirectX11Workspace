@@ -30,6 +30,8 @@ private:
 
 	void CreateVS();
 	void CreatePS();
+
+	void CreateSRV(); 
 	
 private:
 	HWND _hwnd;
@@ -63,9 +65,11 @@ private:
 	float _clearColor[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
 
 private:
-	// Geometry. 도형만들기.
+	// Geometry. 도형 = Mesh 만들기
 	std::vector<Vertex> _vertices; 	// 이거 만드는 건 CPU의 영역이다. RAM에 저장됨.
 	ComPtr<ID3D11Buffer> _vertexBuffer = nullptr; // 이제 GPU의 VRAM으로 넘겨주는 거임.
+	std::vector<uint32> _indices; // 인덱스 버퍼에 넣을 인덱스 순서
+	ComPtr<ID3D11Buffer> _indexBuffer = nullptr; // 인덱스 버퍼.얼마나 정점을 많이 이용하는 도형을 만들 것이냐에 따라 정해주면 된다.
 	ComPtr<ID3D11InputLayout> _inputLayout = nullptr;
 
 	// VS 
@@ -75,5 +79,8 @@ private:
 	// PS
 	ComPtr<ID3D11PixelShader> _pixelShader = nullptr;
 	ComPtr<ID3DBlob> _psBlob = nullptr;
+
+	// SRV
+	ComPtr<ID3D11ShaderResourceView> _shaderResourceView[2] = { nullptr, nullptr };
 };
 

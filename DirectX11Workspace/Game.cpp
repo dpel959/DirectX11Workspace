@@ -23,6 +23,8 @@ void Game::Init(HWND hwnd)
 	CreateVS();
 	CreateInputLayOut();
 	CreatePS();
+
+	CreateSRV();
 }
 
 void Game::Update()
@@ -44,9 +46,11 @@ void Game::Render()
 
 		// 어떤 데이터를 넣어줄거야?
 		_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
-		// 그 데이터는 어떻게 읽어?
+		// 그 버텍스들 어떤 순서로 읽을 거야?
+		_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		// '정점 하나'에 들어간 데이터는 어떤 식으로 해석해?
 		_deviceContext->IASetInputLayout(_inputLayout.Get());
-		// 자 읽어주신 데이터는 삼각형으로 인식해주세요
+		// 자 읽어주신 데이터는 삼각형으로 인식해주세요.
 		_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// VS
@@ -59,10 +63,13 @@ void Game::Render()
 		// PS
 
 		_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+		_deviceContext->PSSetShaderResources(0, 1, _shaderResourceView[0].GetAddressOf());
+		_deviceContext->PSSetShaderResources(1, 1, _shaderResourceView[1].GetAddressOf()); // 맨 앞은 셰이더 인덱스. t0, t1 붙인 거
 
 		// OM
 
-		_deviceContext->Draw(_vertices.size(), 0); // 정점 몇 개인지 입력하고, 그려주세요
+		//_deviceContext->Draw(_vertices.size(), 0); // 정점 몇 개인지 입력하고, 그려주세요
+		_deviceContext->DrawIndexed(_indices.size(), 0, 0); // 인덱스를 참고해서 그린다!
 	}
 
 	RenderEnd(); // 다 그렸으니 제출. 이런 흐름
@@ -197,16 +204,23 @@ void Game::CreateGeometry()
 {
 	// 버텍스들의 데이터! 이건 CPU에 저장하므로, 아직 CPU의 영역 = RAM에 저장됨.
 	{
-		_vertices.resize(3); // 삼각형은 정점 3개가 필요하므로.
+		_vertices.resize(4); // 인덱스 버퍼를 이용해 사각형으로 만들어보자!
 
 		_vertices[0].position = Vec3(-0.5f, -0.5f, 0.f);
-		_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
+		_vertices[0].uv = Vec2(0.f, 1.0f);
+		//_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
 
-		_vertices[1].position = Vec3(0.f, 0.5f, 0);
-		_vertices[1].color = Color(0.f, 1.f, 0.f, 1.f);
+		_vertices[1].position = Vec3(-0.5f, 0.5f, 0.f);
+		_vertices[1].uv = Vec2(0.f, 0.f);
+		//_vertices[1].color = Color(0.f, 1.f, 0.f, 1.f);
 
-		_vertices[2].position = Vec3(0.5f, -0.5f, 0.5f);
-		_vertices[2].color = Color(0.f, 0.f, 1.f, 1.f);
+		_vertices[2].position = Vec3(0.5f, -0.5f, 0.f);
+		_vertices[2].uv = Vec2(1.0f, 1.0f);
+		//_vertices[2].color = Color(0.f, 0.f, 1.f, 1.f);
+
+		_vertices[3].position = Vec3(0.5f, 0.5f, 0.f);
+		_vertices[3].uv = Vec2(1.0f, 0.f);
+		//_vertices[3].color = Color(0.5f, 0.5f, 0.5f, 1.f);
 	}
 
 	// 버텍스 버퍼
@@ -233,7 +247,39 @@ void Game::CreateGeometry()
 		ZeroMemory(&data, sizeof(data));
 		data.pSysMem = _vertices.data(); // == &_vertices[0]
 
-		_device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf()); // CPU 데이터 data를 desc에 따라 _vertexBuffer로 옮겨줘
+		HRESULT hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf()); // CPU 데이터 data를 desc에 따라 _vertexBuffer로 옮겨줘
+	
+		assert(SUCCEEDED(hr));
+	}
+
+	// 인덱스
+	{
+		// 벡터를 채우는 것인데, 중요한 것이 있다. 이것은 '그리는(정점을 활용하는) 순서'이다.
+		// 시계 방향, 반시계 방향 둘 중 하나를 일관적으로 사용해야한다.
+		
+		// 인덱스 버퍼는 사실 버텍스를 버텍스 버퍼에 넣은대로 순서대로 조립하지 말고, 제 순서대로 조립해주세요이다.
+		// 그런데 왜 이게 좋냐고 하면, GPU의 캐시때문이다. 셰이더 연산을 하려고 했는데, 이미 이전에 한 것이면 캐시에서 결과값을 가져온다.
+		// 그리는 순서 제시도 가능 + 캐시로 인해 자연스레 셰이더 연산을 줄일 수 있는 것이다.
+
+		// 이 0,1,2 번호는 버텍스 버퍼에 넣은 정점의 순서를 의미하는 것이다.
+		_indices = { 0,1,2,2,1,3 }; 
+	}
+
+	// 인덱스 버퍼
+	{
+		D3D11_BUFFER_DESC desc;
+		::ZeroMemory(&desc, sizeof(desc));
+		desc.Usage = D3D11_USAGE_IMMUTABLE;
+		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		desc.ByteWidth = static_cast<uint32>(sizeof(uint32) * _indices.size());
+
+		D3D11_SUBRESOURCE_DATA data;
+		::ZeroMemory(&data, sizeof(data));
+		data.pSysMem = _indices.data();
+
+		HRESULT hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
+
+		assert(SUCCEEDED(hr));
 	}
 }
 
@@ -244,7 +290,7 @@ void Game::CreateInputLayOut()
 	{
 		// 밑에 써두는 POSITION, COLOR 같은 이름은 규약은 아니고, HLSL과 연동하기 위해 저장하는 이름
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // 지금 넘길 버퍼에 float,float,float는 POSITION 데이터에요
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0} // !!중요!! 앞의 12바이트를 POSITION이 먹었으니, 저희 12바이트부터 시작해요
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0} // !!중요!! 앞의 12바이트를 POSITION이 먹었으니, 저희 12바이트부터 시작해요
 	};
 
 	const int32 count = sizeof(layout) / sizeof(D3D11_INPUT_ELEMENT_DESC);
@@ -302,3 +348,27 @@ void Game::CreatePS()
 	assert(SUCCEEDED(hr));
 }
 
+// ShaderResourceView. 텍스처 사용에 필요함. 이미지를 받아오는 방법, 라이브러리는 여러가지 있지만, DirectXTex를 사용한다.
+// RTV는 여기다 쓰세요 - OM 단계 쓰기 전용이고, SRV는 텍스처 가져왔으니 쓰세요 - PS 단계 읽기 전용 (자원)이다.
+// 유명한 Render-to-texture라는 기술이 있는데, 처음 파이프라인에 RTV로 그리고, 다음 파이프라인에 SRV로 덮어씌워 본 렌더링 위에 덮는 미니맵/후처리 등을 쓰기도 한다.
+void Game::CreateSRV()
+{
+	DirectX::TexMetadata md;
+	DirectX::ScratchImage img;
+
+	HRESULT hr = ::LoadFromWICFile(L"Skeleton.png", WIC_FLAGS_NONE, &md, img);
+
+	assert(SUCCEEDED(hr));
+
+	hr = CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView[0].GetAddressOf());
+
+	assert(SUCCEEDED(hr));
+
+	hr = ::LoadFromWICFile(L"Golem.jpg", WIC_FLAGS_NONE, &md, img);
+
+	assert(SUCCEEDED(hr));
+
+	hr = CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView[1].GetAddressOf());
+
+	assert(SUCCEEDED(hr));
+}

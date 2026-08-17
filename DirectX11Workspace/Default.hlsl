@@ -9,8 +9,12 @@
 struct VS_INPUT
 {
     float4 position : POSITION; // 우리가 InputLayout에 쓰기로 했던 이름!
-    float4 color : COLOR;
+    float2 uv : TEXCOORD;
+    //float4 color : COLOR;
 };
+
+// 왜 Vector은 float4를 쓰느냐? 하고 하면 그것은 3D 그래픽스에서 물체 이동, 회전, Scale 행렬 계산이 4*4이기 때문이다.
+// 우리는 float3으로 넘겼지만, HLSL가 알아서 맨 마지막 파라미터 W = 1.0f을 붙여 넣어준다. 자동 확장!
 
 // 여기는 C++과의 약속이 아닌, GPU의 래스터라이저와의 약속이다.
 // 그래서 SV_POSITION 태그는 우리가 정해준 게 아닌, 원래 그렇게 하는 '규약'이다.
@@ -19,7 +23,8 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 position : SV_POSITION;
-    float4 color : COLOR;
+    float2 uv : TEXCOORD;
+    //float4 color : COLOR;
 };
 
 // 함수임. 원리는 C++과 같음
@@ -29,7 +34,8 @@ VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output;
     output.position = input.position;
-    output.color = input.color;
+    output.uv = input.uv;
+    //output.color = output.color;
     
     return output;
 }
@@ -47,7 +53,19 @@ VS_OUTPUT VS(VS_INPUT input)
 // 이 VS_OUTPUT으로 넘어올때, RS로 인해 값들이 가중치에 따라 position, color 가 보정되어 넘어옴.
 
 // 게임 엔진에서 Material이 이런 것을 이용해 동작한다.
+
+Texture2D texture0 : register(t0); // t0 레지스터에 texture0이라는 애를 등록(매핑)
+Texture2D texture1 : register(t1);
+SamplerState sampler0 : register(s0); // s0 레지스터에 샘플러를 등록. 샘플러 = '어떻게 갖고 올지'임
+
+// 이 레지스터는 임의로 이름 정하는 게 아니라, 규약이 있다.
+// t0, t1, t2 -> C++ 에서의 리소스 : Texture, Texture2D / 함수 : PSSetShaderResource 와 연동
+// s0, s1, s2 -> 리소스 : SamplerState / 함수 : PSSetSamplers 와 연동
+// b0, b1, b2 -> 리소스 : Constant Buffer / 함수 : VSSetConstantBuffers 와 연동
+
 float4 PS(VS_OUTPUT input) : SV_Target
 {  
-    return input.color;
+    float4 color = texture1.Sample(sampler0, input.uv); // 샘플러의 규약에 따라 텍스처의 uv 좌표에 해당하는 칼라를 빼온다.
+    
+    return color;
 }
