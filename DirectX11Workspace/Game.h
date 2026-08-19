@@ -31,9 +31,13 @@ private:
 	void CreateVS();
 	void CreatePS();
 
+	void CreateRasterizerState();
+	void CreateSamplerState();
+	void CreateBlendState();
 	void CreateSRV(); 
 
 	void CreateConstantBuffer();
+
 	
 private:
 	HWND _hwnd;
@@ -78,12 +82,17 @@ private:
 	ComPtr<ID3D11VertexShader> _vertexShader = nullptr;
 	ComPtr<ID3DBlob> _vsBlob = nullptr; // 셰이더 로드, 저장
 
+	// RS
+	ComPtr<ID3D11RasterizerState> _rasterizerState = nullptr;
+
 	// PS
 	ComPtr<ID3D11PixelShader> _pixelShader = nullptr;
 	ComPtr<ID3DBlob> _psBlob = nullptr;
 
 	// SRV
 	ComPtr<ID3D11ShaderResourceView> _shaderResourceView[2] = { nullptr, nullptr };
+	ComPtr<ID3D11SamplerState> _samplerState = nullptr;
+	ComPtr<ID3D11BlendState> _blendState = nullptr;
 
 	// constant buffer
 	TransformData _transformData;

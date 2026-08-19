@@ -73,7 +73,8 @@ SamplerState sampler0 : register(s0); // s0 레지스터에 샘플러를 등록. 샘플러 = '
 
 float4 PS(VS_OUTPUT input) : SV_Target
 {  
-    float4 color = texture1.Sample(sampler0, input.uv); // 샘플러의 규약에 따라 텍스처의 uv 좌표에 해당하는 칼라를 빼온다.
+    float4 skeleton_color = texture0.Sample(sampler0, input.uv); // 샘플러의 규약에 따라 텍스처의 uv 좌표에 해당하는 칼라를 빼온다.
+    float4 golem_color = texture1.Sample(sampler0, input.uv);
     
-    return color;
+    return lerp(golem_color, skeleton_color, skeleton_color.a);;
 }

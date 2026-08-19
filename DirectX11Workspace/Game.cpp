@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Game.h"
+#include <climits>
 
 Game::Game()
 {
@@ -20,13 +21,18 @@ void Game::Init(HWND hwnd)
 	SetViewPort();
 
 	CreateGeometry();
+
 	CreateVS();
-	CreateInputLayOut();
+	CreateInputLayOut(); // 실행 단계와 다르게, 생성에서는 InputLayout은 VS보다 뒤에 만들어야한다. vsBlob이 필요해서...
+	CreateConstantBuffer();
+
+	CreateRasterizerState();
+	CreateSamplerState();
+	CreateBlendState();
+
 	CreatePS();
 
 	CreateSRV();
-
-	CreateConstantBuffer();
 }
 
 void Game::Update()
@@ -83,6 +89,7 @@ void Game::Render()
 		_deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
 
 		// RS
+		_deviceContext->RSSetState(_rasterizerState.Get());
 
 		// PS
 
@@ -90,7 +97,10 @@ void Game::Render()
 		_deviceContext->PSSetShaderResources(0, 1, _shaderResourceView[0].GetAddressOf());
 		_deviceContext->PSSetShaderResources(1, 1, _shaderResourceView[1].GetAddressOf()); // 맨 앞은 셰이더 인덱스. t0, t1 붙인 거
 
+		_deviceContext->PSSetSamplers(0, 1, _samplerState.GetAddressOf());
+
 		// OM
+		_deviceContext->OMSetBlendState(_blendState.Get(), nullptr, 0xFFFFFFFF);
 
 		//_deviceContext->Draw(_vertices.size(), 0); // 정점 몇 개인지 입력하고, 그려주세요
 		_deviceContext->DrawIndexed(_indices.size(), 0, 0); // 인덱스를 참고해서 그린다!
@@ -231,7 +241,7 @@ void Game::CreateGeometry()
 		_vertices.resize(4); // 인덱스 버퍼를 이용해 사각형으로 만들어보자!
 
 		_vertices[0].position = Vec3(-0.5f, -0.5f, 0.f);
-		_vertices[0].uv = Vec2(0.f, 1.0f);
+		_vertices[0].uv = Vec2(0.f, 5.0f);
 		//_vertices[0].color = Color(1.f, 0.f, 0.f, 1.f);
 
 		_vertices[1].position = Vec3(-0.5f, 0.5f, 0.f);
@@ -239,11 +249,11 @@ void Game::CreateGeometry()
 		//_vertices[1].color = Color(0.f, 1.f, 0.f, 1.f);
 
 		_vertices[2].position = Vec3(0.5f, -0.5f, 0.f);
-		_vertices[2].uv = Vec2(1.0f, 1.0f);
+		_vertices[2].uv = Vec2(5.0f, 5.0f);
 		//_vertices[2].color = Color(0.f, 0.f, 1.f, 1.f);
 
 		_vertices[3].position = Vec3(0.5f, 0.5f, 0.f);
-		_vertices[3].uv = Vec2(1.0f, 0.f);
+		_vertices[3].uv = Vec2(5.0f, 0.f);
 		//_vertices[3].color = Color(0.5f, 0.5f, 0.5f, 1.f);
 	}
 
@@ -369,6 +379,75 @@ void Game::CreatePS()
 	HRESULT hr = _device->CreatePixelShader(_psBlob->GetBufferPointer(),
 		_psBlob->GetBufferSize(), nullptr, _pixelShader.GetAddressOf());
 
+	assert(SUCCEEDED(hr));
+}
+
+void Game::CreateRasterizerState()
+{
+	D3D11_RASTERIZER_DESC desc;
+	::ZeroMemory(&desc, sizeof(desc));
+	desc.FillMode = D3D11_FILL_SOLID; // SOLID : 그냥 있는 그대로 , WIREFRAME : 삼각형 (폴리곤) 단위로만 보여주겠다
+	desc.CullMode = D3D11_CULL_BACK; // CULL_NONE, CULL_FRONT(앞에 있는 걸 자름)도 가능. Q. 근데 앞을 왜 잘라?
+	desc.FrontCounterClockwise = false; // 근데 앞, 뒤를 어떻게 판별하는데요? -> '버텍스가 시계 방향으로 구성되면 앞이다' 라고 알려주는 것
+	// 우리가 인덱스를 0, 1, 2, 2, 1, 3 으로 시계 방향으로 구성했던 것은 이것 때문. 만약 카메라가 봤을때 버텍스 순서가 반시계 방향이면 이 속성이 false면 잘리게 된다.
+	// Q, 근데 이걸 z-depth로 안 하네...? 2D 때문인가?
+	HRESULT hr = _device->CreateRasterizerState(&desc, _rasterizerState.GetAddressOf());
+
+	assert(SUCCEEDED(hr));
+}
+
+// 그래서, 이 Sampler가 하는 것이 무엇이냐? 텍스처의 UV좌표는 0.0f~1.0f이다.
+// 그런데 넣어진 값이 '범위를 벗어나면, 그 값을 어떻게 반영할 것인가?'를 담당한다.
+// 그것을 어떻게 담당할지를 'ADDRESS MODE'라고 한다.
+void Game::CreateSamplerState()
+{
+	D3D11_SAMPLER_DESC desc;
+	::ZeroMemory(&desc, sizeof(desc));
+
+	// BORDER: 밑에서 설정한 BorderColor로 채운다. 스나이퍼 조준경 밖 암전 처리
+	// MIRROR: UV 좌표 값을 거울에 대칭시키듯 채운다. 
+	// WRAP: UV 좌표 값을 반복 적용한다. 타일 등에 이용.
+	// CLAMP: 가장자리 픽셀을 쭉 늘린다. UI 아이콘, 스카이박스 등에 이용
+	// MIRROR_ONCE: 0,0을 기준으로 딱 한번만 거울 반사하고, 나머지는 CLAMP한다. 나비 같이 완벽한 좌우 대칭 등에 이용
+	desc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	desc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	desc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+
+	// BorderColor는 순서대로 RGBA이다.
+	desc.BorderColor[0] = 1;
+	desc.BorderColor[1] = 0;
+	desc.BorderColor[2] = 0;
+	desc.BorderColor[3] = 1;
+
+	desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	desc.MaxAnisotropy = 16;
+	desc.MaxLOD = (std::numeric_limits<float>::max)();
+	desc.MinLOD = (std::numeric_limits<float>::min)();
+	desc.MipLODBias = 0.0f;
+
+	_device->CreateSamplerState(&desc, _samplerState.GetAddressOf());
+}
+
+// 텍스처의 Alpha 값에 따라, 어떻게 섞여야 할 것인지
+void Game::CreateBlendState()
+{
+	D3D11_BLEND_DESC desc;
+	::ZeroMemory(&desc, sizeof(desc));
+	desc.AlphaToCoverageEnable = false;
+	desc.IndependentBlendEnable = false;
+
+	desc.RenderTarget[0].BlendEnable = true;
+	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Src = 새로 만드는 픽셀에 Src의 알파값 만큼을 투명도를 곱하겠다
+	desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA; // Dest = 원래 있었던 픽셀에 (1 - Src의 알파값) 만큼을 투명도에 곱하곘다.
+	desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD; // 그걸 더하겠다. 일반적인 알파 블렌딩. 
+	//보통 이펙트에 사용하는 가산 블렌딩은 SrcBlend와 DestBlend를 둘 다 D3D11_BLEND_ONE = 모두 그대로 적용.으로 설정한다. 빛 유지 + 새로운 빛 발광 = 즉 이펙트 등에 많이 사용한다.
+	desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	HRESULT hr = _device->CreateBlendState(&desc, _blendState.GetAddressOf());
 	assert(SUCCEEDED(hr));
 }
 
