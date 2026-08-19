@@ -27,13 +27,21 @@ struct VS_OUTPUT
     //float4 color : COLOR;
 };
 
+// VS_INPUT / VS_OUTPUT 은 도형 정보다. cbuffer은 별개의 상수 버퍼.
+
+cbuffer TransformData : register(b0)
+{
+    float4 offset;
+}
+
 // 함수임. 원리는 C++과 같음
 // 지금 IA - VS - RS - PS - OM 에서 [IA-VS] 단계임.
 // 단, 파라미터는 뭉탱이로 받지만, 이 함수 자체는 버텍스 단위로 실행된다. 거의 위치 관련을 담당한다.
+
 VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.position = input.position;
+    output.position = input.position + offset;
     output.uv = input.uv;
     //output.color = output.color;
     

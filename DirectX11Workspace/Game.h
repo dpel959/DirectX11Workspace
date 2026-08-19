@@ -32,6 +32,8 @@ private:
 	void CreatePS();
 
 	void CreateSRV(); 
+
+	void CreateConstantBuffer();
 	
 private:
 	HWND _hwnd;
@@ -82,5 +84,9 @@ private:
 
 	// SRV
 	ComPtr<ID3D11ShaderResourceView> _shaderResourceView[2] = { nullptr, nullptr };
+
+	// constant buffer
+	TransformData _transformData;
+	ComPtr<ID3D11Buffer> _constantBuffer;
 };
 
