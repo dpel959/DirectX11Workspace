@@ -31,8 +31,14 @@ struct VS_OUTPUT
 
 cbuffer TransformData : register(b0)
 {
-    float4 offset;
-}
+    // HLSL의 기본 설정이 Column-major라서 명시해야 함.
+    // OpenGL는 열벡터를 사용해서 Column-major을 사용해야했다. 
+    // 이유는 당연히 애초에 행렬 저장도 연산도 column-major로 하므로, 메모리에도 그렇게 저장하고 읽어오는 것이 훨씬 좋았기 때문.
+    // C++, 다렉은 행벡터를 사용해서, row-major로 메모리에 저장해서, 반대이다.
+    row_major matrix matWorld;
+    row_major matrix matView;
+    row_major matrix matProjection;
+};
 
 // 함수임. 원리는 C++과 같음
 // 지금 IA - VS - RS - PS - OM 에서 [IA-VS] 단계임.
@@ -41,7 +47,12 @@ cbuffer TransformData : register(b0)
 VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.position = input.position + offset;
+    
+    float4 position = mul(input.position, matWorld);
+    position = mul(position, matView);
+    position = mul(position, matProjection);
+    
+    output.position = position;
     output.uv = input.uv;
     //output.color = output.color;
     

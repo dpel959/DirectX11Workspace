@@ -10,9 +10,12 @@ struct Vertex
 
 struct TransformData
 {
-	Vec3 offset;
-	float dummy; // constant buffer을 만들때는 16바이트 정렬을 해야한다.
+	Matrix matWorld = Matrix::Identity;
+	Matrix matView = Matrix::Identity;
+	Matrix matProjection = Matrix::Identity;
 };
+
+// constant buffer을 만들때는 16바이트 정렬을 해야한다.
 
 // 근데 왜 갑자기 이제 와서 바이트 정렬을? 버텍스 버퍼 받을 때는 정렬 안 했잖아!
 // 버텍스 버퍼는 어떤 이름의 데이터가 어떤 크기를 가진다는 명세서가 있었다. 하지만 상수버퍼는 그게 없다.

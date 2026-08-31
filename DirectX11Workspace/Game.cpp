@@ -37,8 +37,19 @@ void Game::Init(HWND hwnd)
 
 void Game::Update()
 {
-	_transformData.offset.x += 0.0003f;
-	_transformData.offset.y += 0.0003f;
+	_localPosition.x += 0.001f;
+
+	Matrix matScale = Matrix::CreateScale(_localScale / 3);
+	Matrix matRotation = Matrix::CreateRotationX(_localRotation.x);
+	matRotation *= Matrix::CreateRotationY(_localRotation.y);
+	matRotation *= Matrix::CreateRotationZ(_localRotation.z);
+	// 이 회전도 순서를 무조건 잘 지켜야한다. X->Y->Z 순이다. 순서에 따라 각도가 달라진다.
+	// 물론, 이런 오일러 각은 사용이 좀 불편하고 짐벌락 문제도 있어서 쿼터니언을 쓰긴 한다. 지금은 오일러로.
+	Matrix matTranslation = Matrix::CreateTranslation(_localPosition);
+
+	Matrix matWorld = matScale * matRotation * matTranslation; // SRT! 
+
+	_transformData.matWorld = matWorld;
 
 	D3D11_MAPPED_SUBRESOURCE subResource; 
 	ZeroMemory(&subResource, sizeof(subResource));
