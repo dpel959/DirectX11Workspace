@@ -1,0 +1,64 @@
+#pragma once
+#include <memory>
+#include "Geometry.h"
+#include "VertexData.h"
+#include "ConstantBuffer.h"
+
+class Pipeline;
+
+class VertexShader;
+class PixelShader;
+class Texture;
+class RasterizerState;
+class SamplerState;
+class BlendState;
+
+class GameObject
+{
+public:
+	GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext);
+	~GameObject();
+
+	void Update();
+
+	void Render(std::shared_ptr<Pipeline> pipeline);
+
+private:
+	ComPtr<ID3D11Device> _device;
+
+	// Geometry. 도형 = Mesh 만들기.
+	// Geometry는 리소스이다. 각 '객체'가 아닌, '리소스'(메쉬) 단위로 하나씩 들고 있으면 되는 것.
+	std::shared_ptr<Geometry<VertexTextureData>> _geometry;
+	// 	std::shared_ptr<Geometry<VertexColorData>> _geometry;
+	std::shared_ptr<VertexBuffer> _vertexBuffer;
+	std::shared_ptr<IndexBuffer> _indexBuffer;
+	std::shared_ptr<InputLayout> _inputLayout;
+
+	// VS 
+	std::shared_ptr<VertexShader> _vertexShader;
+
+	// RS
+	std::shared_ptr<RasterizerState> _rasterizerState;
+
+	// PS
+	std::shared_ptr<PixelShader> _pixelShader;
+
+	// SRV
+	std::vector<std::shared_ptr<Texture>> _textures;
+	std::shared_ptr<SamplerState> _samplerState;
+	std::shared_ptr<BlendState> _blendState;
+
+	// --- 여기 '위'는 '리소스' 마다 같은 부분.
+	// --- 여기 '밑'은 '오브젝트' 마다 다른 부분.
+	
+	// constant buffer
+	TransformData _transformData;
+	std::shared_ptr<ConstantBuffer<TransformData>> _constantBuffer;
+
+	// local SRT
+
+	Vec3 _localPosition = { 0.f,0.f,0.f };
+	Vec3 _localRotation = { 0.f,0.f,0.f };
+	Vec3 _localScale = { 1.f,1.f,1.f };
+};
+

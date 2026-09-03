@@ -54,7 +54,7 @@ VS_OUTPUT VS(VS_INPUT input)
     
     output.position = position;
     output.uv = input.uv;
-    //output.color = output.color;
+    //output.color = input.color;
     
     return output;
 }
@@ -87,5 +87,6 @@ float4 PS(VS_OUTPUT input) : SV_Target
     float4 skeleton_color = texture0.Sample(sampler0, input.uv); // 샘플러의 규약에 따라 텍스처의 uv 좌표에 해당하는 칼라를 빼온다.
     float4 golem_color = texture1.Sample(sampler0, input.uv);
     
-    return lerp(golem_color, skeleton_color, skeleton_color.a);;
+    return lerp(golem_color, skeleton_color, skeleton_color.a);
+    //return input.color;
 }
