@@ -1,9 +1,5 @@
 #pragma once
 
-#include "Types.h"
-#include "Values.h"
-#include "Struct.h"
-
 //STL
 #include <vector>
 #include <list>
@@ -11,8 +7,10 @@
 #include <unordered_map>
 
 //WIN
+#define WIN32_LEAN_AND_MEAN // 무거운 윈도우 기능들 제외
+#define NOMINMAX // std::min, std;:max 충돌 없애기
 #include <windows.h>
-#include <assert.h>
+#include <cassert>
 
 //DX
 #include <d3d11.h>          // DirectX 11 핵심 기능 (ID3D11Device, Context 등)
@@ -23,6 +21,8 @@
 #include <DirectXTex/DirectXTex.inl> // C++ 소스 코드. 라이브러리는 아님. cpp인데 인라인이고, #include 안 하면 안 읽힘.
 // 부록 cpp가 제일 맞는 말일듯.
 
+// 강의와 차별점 : using namespace 에서 바꿔줬음. 좋지 않은 습관이라
+// + 모든 걸 pch에 넣기보다는, 다들 쓰는 것만 넣기.
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
@@ -36,5 +36,11 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "DirectXTex\\DirectXTex.lib")     // 릴리스 모드일 때는 최적화된 DirectXTex.lib 연결
 #endif
 
-// OUT define
-#define OUT
+#include "Types.h"
+#include "Values.h"
+#include "Struct.h"
+
+#include "Graphics.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "InputLayout.h"
