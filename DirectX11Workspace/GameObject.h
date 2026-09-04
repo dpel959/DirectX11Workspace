@@ -13,13 +13,15 @@ class RasterizerState;
 class SamplerState;
 class BlendState;
 
+class Transform;
+
 class GameObject
 {
 public:
 	GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext);
 	~GameObject();
 
-	void Update();
+	void Update(bool isParent);
 
 	void Render(std::shared_ptr<Pipeline> pipeline);
 
@@ -54,11 +56,7 @@ private:
 	// constant buffer
 	TransformData _transformData;
 	std::shared_ptr<ConstantBuffer<TransformData>> _constantBuffer;
-
-	// local SRT
-
-	Vec3 _localPosition = { 0.f,0.f,0.f };
-	Vec3 _localRotation = { 0.f,0.f,0.f };
-	Vec3 _localScale = { 1.f,1.f,1.f };
+public:
+	std::shared_ptr<Transform> _transform = std::make_shared<Transform>();
 };
 

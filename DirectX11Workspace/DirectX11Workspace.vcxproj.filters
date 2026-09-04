@@ -51,6 +51,9 @@
     <Filter Include="소스 파일\00. Engine\GameObject">
       <UniqueIdentifier>{76168392-dbbf-4bcb-9cfd-51e68fbf90df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\00. Engine\Component">
+      <UniqueIdentifier>{7f911f91-80e9-495f-917e-06ed228e3f4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -128,6 +131,12 @@
     <ClInclude Include="GameObject.h">
       <Filter>소스 파일\00. Engine\GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>소스 파일\00. Engine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>소스 파일\00. Engine\GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX11Workspace.rc">
@@ -198,6 +207,12 @@
       <Filter>소스 파일\00. Engine\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
+      <Filter>소스 파일\00. Engine\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>소스 파일\00. Engine\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
       <Filter>소스 파일\00. Engine\GameObject</Filter>
     </ClCompile>
   </ItemGroup>

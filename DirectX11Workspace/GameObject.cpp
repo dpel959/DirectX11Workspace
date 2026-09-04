@@ -7,6 +7,7 @@
 #include "BlendState.h"
 #include "Texture.h"
 #include "Pipeline.h"
+#include "Transform.h"
 
 GameObject::GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext)
 	:_device(device)
@@ -64,21 +65,31 @@ GameObject::~GameObject()
 
 }
 
-void GameObject::Update()
+void GameObject::Update(bool isParent)
 {
-	_localPosition.x += 0.001f;
+	if (isParent)
+	{
+		Vec3 pos = _transform->GetPosition();
 
-	Matrix matScale = Matrix::CreateScale(_localScale / 3);
-	Matrix matRotation = Matrix::CreateRotationX(_localRotation.x);
-	matRotation *= Matrix::CreateRotationY(_localRotation.y);
-	matRotation *= Matrix::CreateRotationZ(_localRotation.z);
-	// 이 회전도 순서를 무조건 잘 지켜야한다. X->Y->Z 순이다. 순서에 따라 각도가 달라진다.
-	// 물론, 이런 오일러 각은 사용이 좀 불편하고 짐벌락 문제도 있어서 쿼터니언을 쓰긴 한다. 지금은 오일러로.
-	Matrix matTranslation = Matrix::CreateTranslation(_localPosition);
+		pos.x += 0.001f;
 
-	Matrix matWorld = matScale * matRotation * matTranslation; // SRT! 
+		_transform->SetPosition(pos);
+	}
+	else
+	{
+		Quaternion rot = _transform->GetRotation();
 
-	_transformData.matWorld = matWorld;
+		// 쿼터니언은 4차원 변수인 w가 있고, 곱셉으로 각도를 움직여서, 좀 하기 번거롭다.
+		Quaternion deltaRot = Quaternion::CreateFromAxisAngle(Vec3::Backward, 0.001f);
+
+		rot *= deltaRot;
+
+		rot.Normalize();
+
+		_transform->SetRotation(rot);
+	}
+
+	_transformData.matWorld = _transform->GetWorldmatrix();
 
 	_constantBuffer->CopyData(_transformData);
 }

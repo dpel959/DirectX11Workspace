@@ -23,6 +23,8 @@ using Vec3 = DirectX::SimpleMath::Vector3;
 using Vec4 = DirectX::SimpleMath::Vector4;
 using Matrix = DirectX::SimpleMath::Matrix;
 
+using Quaternion = DirectX::SimpleMath::Quaternion;
+
 ///
 /// 이건 뭔데 XMFLOAT를 버리고 쓰나요?
 /// -> SimpleMath는 XMFLOAT를 그대로 상속받은 타입이다. 뭐가 다르냐 하면 연산자를 지원한다. (+ 내적, 외적 등의 기능 등)
