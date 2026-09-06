@@ -73,3 +73,8 @@ Testing/
 x64/
 Debug/
 Release/
+
+# ppt, pdfs
+output/
+tmp/
+.codex-finalizer-pptx/

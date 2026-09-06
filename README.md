@@ -20,7 +20,7 @@ CPU에서 만든 데이터가 **어떤 과정을 거쳐 GPU와 화면으로 전�
 
 ## 강의 기반과 차별화
 
-이 프로젝트는 온라인 DirectX 11 강의를 기반으로 기본 렌더링 흐름을 학습하며 시작했습니다.
+이 프로젝트는 인프런 Rookiss님의 「[게임 프로그래머 도약반] DirectX11 입문」 강의를 기반으로 기본 렌더링 흐름을 학습하며 시작했습니다.
 
 강의 내용을 그대로 재현하는 데서 끝내지 않고, 학습 중 생긴 질문을 주석으로 정리하고 구조와 API 사용을 다시 검토했습니다. 그 과정에서 다음 부분을 별도로 확장하거나 개선했습니다.
 
@@ -204,6 +204,18 @@ Input Layout, Shader Resource, Sampler, Constant Buffer가 각각 어떤 레지�
 
 - Local/World Matrix 계산과 재귀 갱신: [Transform.cpp](./DirectX11Workspace/Transform.cpp)
 - Transform 데이터와 인터페이스: [Transform.h](./DirectX11Workspace/Transform.h)
+
+### 추가로 살펴볼 학습 기록
+
+README에서는 대표적인 주제만 추렸습니다. 아래 파일에도 구현 과정에서 정리한 학습 메모가 있습니다. 결과 코드뿐 아니라 각 개념을 이해해 가는 과정도 함께 봐주시면 감사하겠습니다.
+
+| 주제 | 주석에 정리한 내용 | 관련 코드 |
+| --- | --- | --- |
+| Index Buffer와 Geometry | 정점 재사용, 인덱스 순서와 앞면 판정, CPU 측 Geometry 데이터 분리 | [IndexBuffer.cpp](./DirectX11Workspace/IndexBuffer.cpp), [Geometry.h](./DirectX11Workspace/Geometry.h), [GeometryHelper.cpp](./DirectX11Workspace/GeometryHelper.cpp) |
+| Rasterizer | Fill/Cull 모드, 앞면을 판정하는 정점 순서, Rasterizer 단계의 클리핑 | [RasterizerState.cpp](./DirectX11Workspace/RasterizerState.cpp) |
+| Sampler State | UV 범위 밖의 Address Mode와 일반 Linear Filter·Comparison Filter의 차이 | [SamplerState.cpp](./DirectX11Workspace/SamplerState.cpp) |
+| Constant Buffer 데이터 구성 | 상수 버퍼의 16바이트 단위 규칙과 World·View·Projection 데이터 구성 | [Struct.h](./DirectX11Workspace/Struct.h), [ConstantBuffer.h](./DirectX11Workspace/ConstantBuffer.h) |
+| DirectXMath와 SimpleMath | `XMFLOAT`, `XMVECTOR`, SimpleMath 타입을 사용하는 이유와 좌표계 주의점 | [Types.h](./DirectX11Workspace/Types.h) |
 
 ## 학습 과정
 

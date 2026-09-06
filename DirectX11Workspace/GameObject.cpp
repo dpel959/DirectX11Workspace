@@ -55,7 +55,7 @@ GameObject::GameObject(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::W
 	_textures[1] = std::make_shared<Texture>(device);
 
 	_textures[0]->Create(L"Skeleton.png");
-	_textures[1]->Create(L"Golem.jpg");
+	_textures[1]->Create(L"Golem.png");
 
 	_blendState = std::make_shared<BlendState>(device);
 	_blendState->Create();
