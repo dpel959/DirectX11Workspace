@@ -1,13 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
-// »ç½Ç ÀÌ·¸°Ô Position, UV µé°í ÀÖ´Â °ÍÀº VertexTextureData¶ó°í ÇÑ´Ù.
+// ì‚¬ì‹¤ ì´ë ‡ê²Œ Position, UV ë“¤ê³  ìˆëŠ” ê²ƒì€ VertexTextureDataë¼ê³  í•œë‹¤.
 struct VertexTextureData
 {
 	Vec3 position = { 0.f,0.f,0.f };
 	Vec2 uv = { 0.f,0.f };
 
-	// desc¸¦ ±¸º°ÇØ ³Ñ°ÜÁÖ´Â ¹æ¹ıÀº ¿©·¯°³°¡ ÀÖ´Âµ¥, ID¸¦ ´ëÁ¶ÇØ¼­ ³Ñ°ÜÁÖ´Â ¹æ¹ıµµ ÀÖ°í,
-	// ÀÌ·¸°Ô struct¸¶´Ù staticÀ» ¸¸µé¾î ³Ñ°ÜÁÖ´Â ¹æ¹ıµµ ÀÖ´Ù.
+	// descë¥¼ êµ¬ë³„í•´ ë„˜ê²¨ì£¼ëŠ” ë°©ë²•ì€ ì—¬ëŸ¬ê°œê°€ ìˆëŠ”ë°, IDë¥¼ ëŒ€ì¡°í•´ì„œ ë„˜ê²¨ì£¼ëŠ” ë°©ë²•ë„ ìˆê³ ,
+	// ì´ë ‡ê²Œ structë§ˆë‹¤ staticì„ ë§Œë“¤ì–´ ë„˜ê²¨ì£¼ëŠ” ë°©ë²•ë„ ìˆë‹¤.
 	static std::vector<D3D11_INPUT_ELEMENT_DESC> descs;
 };
 

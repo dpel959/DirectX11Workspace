@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "BlendState.h"
 
 BlendState::BlendState(ComPtr<ID3D11Device> device)
@@ -12,7 +12,10 @@ BlendState::~BlendState()
 
 void BlendState::Create(D3D11_RENDER_TARGET_BLEND_DESC blendDesc, float factor)
 {
-	_blendFactor = factor;
+	for (float& blendFactor : _blendFactor)
+	{
+		blendFactor = factor;
+	}
 
 	D3D11_BLEND_DESC desc;
 	::ZeroMemory(&desc, sizeof(desc));
@@ -25,10 +28,10 @@ void BlendState::Create(D3D11_RENDER_TARGET_BLEND_DESC blendDesc, float factor)
 	assert(SUCCEEDED(hr));
 }
 
-// À§¿¡ ÄÚµå°¡ ¹» ÇÑ °ÍÀÌ³Ä¸é,
+// ìœ„ì— ì½”ë“œê°€ ë­˜ í•œ ê²ƒì´ëƒë©´,
 #if 0
 
-// ÅØ½ºÃ³ÀÇ Alpha °ª¿¡ µû¶ó, ¾î¶»°Ô ¼¯¿©¾ß ÇÒ °ÍÀÎÁö
+// í…ìŠ¤ì²˜ì˜ Alpha ê°’ì— ë”°ë¼, ì–´ë–»ê²Œ ì„ì—¬ì•¼ í•  ê²ƒì¸ì§€
 void Game::CreateBlendState()
 {
 	D3D11_BLEND_DESC desc;
@@ -37,10 +40,10 @@ void Game::CreateBlendState()
 	desc.IndependentBlendEnable = false;
 
 	desc.RenderTarget[0].BlendEnable = true;
-	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Src = »õ·Î ¸¸µå´Â ÇÈ¼¿¿¡ SrcÀÇ ¾ËÆÄ°ª ¸¸Å­À» Åõ¸íµµ¸¦ °öÇÏ°Ú´Ù
-	desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA; // Dest = ¿ø·¡ ÀÖ¾ú´ø ÇÈ¼¿¿¡ (1 - SrcÀÇ ¾ËÆÄ°ª) ¸¸Å­À» Åõ¸íµµ¿¡ °öÇÏÙ´Ù.
-	desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD; // ±×°É ´õÇÏ°Ú´Ù. ÀÏ¹İÀûÀÎ ¾ËÆÄ ºí·»µù. 
-	//º¸Åë ÀÌÆåÆ®¿¡ »ç¿ëÇÏ´Â °¡»ê ºí·»µùÀº SrcBlend¿Í DestBlend¸¦ µÑ ´Ù D3D11_BLEND_ONE = ¸ğµÎ ±×´ë·Î Àû¿ë.À¸·Î ¼³Á¤ÇÑ´Ù. ºû À¯Áö + »õ·Î¿î ºû ¹ß±¤ = Áï ÀÌÆåÆ® µî¿¡ ¸¹ÀÌ »ç¿ëÇÑ´Ù.
+	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Src = ìƒˆë¡œ ë§Œë“œëŠ” í”½ì…€ì— Srcì˜ ì•ŒíŒŒê°’ ë§Œí¼ì„ íˆ¬ëª…ë„ë¥¼ ê³±í•˜ê² ë‹¤
+	desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA; // Dest = ì›ë˜ ìˆì—ˆë˜ í”½ì…€ì— (1 - Srcì˜ ì•ŒíŒŒê°’) ë§Œí¼ì„ íˆ¬ëª…ë„ì— ê³±í•˜ê³˜ë‹¤.
+	desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD; // ê·¸ê±¸ ë”í•˜ê² ë‹¤. ì¼ë°˜ì ì¸ ì•ŒíŒŒ ë¸”ë Œë”©. 
+	//ë³´í†µ ì´í™íŠ¸ì— ì‚¬ìš©í•˜ëŠ” ê°€ì‚° ë¸”ë Œë”©ì€ SrcBlendì™€ DestBlendë¥¼ ë‘˜ ë‹¤ D3D11_BLEND_ONE = ëª¨ë‘ ê·¸ëŒ€ë¡œ ì ìš©.ìœ¼ë¡œ ì„¤ì •í•œë‹¤. ë¹› ìœ ì§€ + ìƒˆë¡œìš´ ë¹› ë°œê´‘ = ì¦‰ ì´í™íŠ¸ ë“±ì— ë§ì´ ì‚¬ìš©í•œë‹¤.
 	desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 	desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;

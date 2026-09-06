@@ -1,1 +1,200 @@
-# DirectX11Workspace
+# DirectX 11 Rendering Study
+
+Win32와 DirectX 11을 이용해 렌더링 파이프라인을 직접 구성하고,  
+GPU 리소스 관리부터 계층형 Transform까지 단계적으로 학습한 프로젝트입니다.
+
+화면에 도형을 출력하는 결과만 만드는 것이 아니라, 각 API가 **왜 필요한지**,  
+CPU에서 만든 데이터가 **어떤 과정을 거쳐 GPU와 화면으로 전달되는지**를 이해하는 데 집중했습니다.
+
+학습 과정에서 생긴 질문과 답을 코드 주석으로 남겨, 구현의 근거와 사고 과정을 함께 확인할 수 있도록 했습니다.
+
+## 프로젝트 목표
+
+- DirectX 11 초기화 과정과 각 객체의 책임 이해
+- IA → VS → RS → PS → OM으로 이어지는 렌더링 파이프라인 이해
+- CPU와 GPU 사이의 리소스 생성 및 데이터 전달 과정 이해
+- 행렬과 Quaternion을 이용한 Local/World Transform 이해
+- 기능이 늘어남에 따라 코드를 역할별 클래스로 분리하는 과정 경험
+
+이 프로젝트는 범용 게임 엔진 제작보다, DirectX 11의 기반 개념을 **직접 구현하고 설명할 수 있는 상태로 만드는 것**을 목표로 했습니다.
+
+## 실행 결과
+
+- Index Buffer를 이용한 텍스처 사각형 렌더링
+- 두 텍스처를 알파값에 따라 혼합
+- 부모 오브젝트 이동
+- 자식 오브젝트 회전
+- 부모 Transform 변경에 따른 자식 World Transform 재계산
+
+> 실행 화면 GIF를 추가하면 렌더링 결과와 부모-자식 움직임을 가장 빠르게 보여줄 수 있습니다.
+
+## 주요 구현
+
+### DirectX 11 초기화
+
+- Win32 창 생성 및 메시지 루프 구성
+- D3D11 Device와 DeviceContext 생성
+- DXGI SwapChain 구성
+- Back Buffer 기반 Render Target View 생성
+- Viewport 설정 및 Present
+
+관련 코드: [Graphics.cpp](./DirectX11Workspace/Graphics.cpp), [DirectX11Workspace.cpp](./DirectX11Workspace/DirectX11Workspace.cpp)
+
+### 렌더링 파이프라인
+
+- Input Layout과 Primitive Topology 설정
+- Vertex/Pixel Shader 바인딩
+- Rasterizer, Sampler, Blend State 구성
+- Vertex/Index/Constant Buffer 및 Texture 바인딩
+- `PipelineInfo`를 이용한 파이프라인 상태 묶음 관리
+
+관련 코드: [Pipeline.cpp](./DirectX11Workspace/Pipeline.cpp), [Pipeline.h](./DirectX11Workspace/Pipeline.h)
+
+### GPU 리소스 래핑
+
+DirectX API 객체를 기능별 클래스로 분리했습니다.
+
+| 구분 | 역할 |
+| --- | --- |
+| `VertexBuffer` | 정점 데이터를 GPU 버퍼로 생성 |
+| `IndexBuffer` | 정점 조립 순서를 GPU 버퍼로 생성 |
+| `ConstantBuffer<T>` | CPU에서 갱신한 데이터를 Shader Constant Buffer로 전달 |
+| `InputLayout` | C++ 정점 구조와 Vertex Shader 입력 형식 연결 |
+| `Shader` | HLSL 컴파일 및 Vertex/Pixel Shader 생성 |
+| `Texture` | DirectXTex를 이용한 이미지 로딩과 SRV 생성 |
+| `RasterizerState` | Fill/Cull/Depth Clip 상태 관리 |
+| `SamplerState` | Texture Address Mode와 Filter 관리 |
+| `BlendState` | 렌더 타깃의 색상 혼합 방식 관리 |
+
+### Geometry와 텍스처 렌더링
+
+- 정점 4개와 Index 6개로 사각형 생성
+- Position/UV 기반 Input Layout 구성
+- DirectXTex의 WIC 로더로 PNG/JPG 로딩
+- HLSL에서 두 텍스처를 샘플링하고 알파값으로 혼합
+
+관련 코드: [GeometryHelper.cpp](./DirectX11Workspace/GeometryHelper.cpp), [Default.hlsl](./DirectX11Workspace/Default.hlsl)
+
+### Transform 계층 구조
+
+- Scale → Rotation → Translation 순서로 Local Matrix 구성
+- 부모 World Matrix를 이용한 자식 World Matrix 계산
+- 완성된 World Matrix에서 Scale, Rotation, Position 분해
+- World Position을 설정할 때 부모 World Matrix의 역행렬로 Local Position 계산
+- Quaternion 기반 회전
+- 부모 변경 시 이전 부모와 새 부모의 자식 목록을 함께 갱신
+- 부모는 `weak_ptr`, 자식은 `shared_ptr`로 관리해 순환 참조 방지
+- 부모가 변경되면 하위 Transform을 재귀적으로 갱신
+
+관련 코드: [Transform.cpp](./DirectX11Workspace/Transform.cpp), [Transform.h](./DirectX11Workspace/Transform.h)
+
+## 구조
+
+```mermaid
+flowchart LR
+    Loop[Win32 Message Loop] --> Game
+    Game --> Graphics
+    Game --> Parent[Parent GameObject]
+    Game --> Child[Child GameObject]
+
+    Parent --> Pipeline
+    Child --> Pipeline
+    Parent --> ParentTransform[Parent Transform]
+    Child --> ChildTransform[Child Transform]
+    ParentTransform --> ChildTransform
+
+    Pipeline --> IA[Input Assembler]
+    IA --> VS[Vertex Shader]
+    VS --> RS[Rasterizer]
+    RS --> PS[Pixel Shader]
+    PS --> OM[Output Merger]
+    OM --> Graphics
+    Graphics --> Present
+```
+
+## 주석으로 남긴 학습 기록
+
+이 프로젝트에서 주석은 코드의 동작을 다시 읽어주는 설명보다, 학습 중 생긴 **“왜?”에 대한 답**을 기록하는 데 사용했습니다.
+
+### Resource와 View의 관계
+
+Texture2D 같은 Resource는 GPU 메모리에 저장된 데이터이고, RTV와 SRV는 그 데이터를 파이프라인에서 어떤 용도로 해석할지 설명한다는 관점으로 정리했습니다.
+
+- Back Buffer를 Render Target으로 해석하는 과정: [Graphics.cpp](./DirectX11Workspace/Graphics.cpp)
+- 이미지 Resource를 Shader에서 읽도록 만드는 과정: [Texture.cpp](./DirectX11Workspace/Texture.cpp)
+
+### CPU에서 GPU로 데이터가 이동하는 과정
+
+정적 정점 데이터에는 `IMMUTABLE`, 매 프레임 변경되는 Constant Buffer에는 `DYNAMIC`과 `Map/Unmap`을 사용한 이유를 코드와 함께 기록했습니다.
+
+- 정적 Vertex Buffer 생성: [VertexBuffer.h](./DirectX11Workspace/VertexBuffer.h)
+- 동적 Constant Buffer 갱신: [ConstantBuffer.h](./DirectX11Workspace/ConstantBuffer.h)
+
+### 파이프라인 단계별 역할
+
+Input Layout, Shader Resource, Sampler, Constant Buffer가 각각 어떤 레지스터 및 파이프라인 단계와 연결되는지 구현 위치에 설명을 남겼습니다.
+
+- C++ 파이프라인 바인딩: [Pipeline.cpp](./DirectX11Workspace/Pipeline.cpp)
+- HLSL의 `b`, `t`, `s` 레지스터: [Default.hlsl](./DirectX11Workspace/Default.hlsl)
+
+### Local과 World Transform
+
+단순히 행렬 공식을 적용하는 데서 끝내지 않고, 부모의 회전과 크기까지 반영된 좌표를 World에서 Local로 변환하려면 왜 부모 World Matrix의 역행렬이 필요한지 정리했습니다.
+
+- Local/World Matrix 계산과 재귀 갱신: [Transform.cpp](./DirectX11Workspace/Transform.cpp)
+- Transform 데이터와 인터페이스: [Transform.h](./DirectX11Workspace/Transform.h)
+
+## 학습 과정
+
+| 단계 | 학습 및 구현 내용 |
+| --- | --- |
+| 1 | DirectX 11과 DirectXTex 개발 환경 구성 |
+| 2 | Device, DeviceContext, SwapChain 초기화 |
+| 3 | Input Layout과 VS/PS를 이용한 삼각형 렌더링 |
+| 4 | Index Buffer와 Texture를 이용한 사각형 렌더링 |
+| 5 | Constant Buffer를 이용한 오브젝트 이동 |
+| 6 | Rasterizer, Sampler, Blend State 구현 |
+| 7 | WVP 행렬과 SimpleMath 적용 |
+| 8 | 렌더링 기능을 역할별 클래스로 리팩터링 |
+| 9 | GameObject 구조로 오브젝트 데이터 분리 |
+| 10 | Transform 컴포넌트와 부모-자식 계층 구현 |
+
+## 학습 중 발견하고 수정한 문제
+
+- HLSL의 UTF-8 BOM으로 인한 `fxc` 컴파일 오류를 확인하고 UTF-8 without BOM으로 변경
+- 부모와 자식 Transform이 서로를 `shared_ptr`로 소유하던 순환 참조 제거
+- `ShaderScope`에 VS와 PS가 함께 지정될 때 `else if` 때문에 한쪽만 바인딩되던 문제 수정
+- Pipeline에 전달한 Primitive Topology와 Sampler Slot이 무시되던 문제 수정
+- 일반 색상 샘플링에 Comparison Filter를 사용하던 문제 수정
+- Blend Factor를 API가 요구하는 RGBA 4개 값으로 수정
+- Vertex Color Input Layout의 Semantic 불일치 수정
+
+이 과정을 통해 API를 호출하는 것뿐 아니라, **API가 요구하는 데이터 형식과 객체 소유 관계, 상태 변경의 일관성까지 검토하는 경험**을 얻었습니다.
+
+## 개발 환경
+
+- Windows 10/11
+- Visual Studio 2022
+- C++17
+- DirectX 11
+- HLSL Shader Model 5.0
+- DirectXMath SimpleMath
+- DirectXTex
+- x64 Debug
+
+## 빌드 및 실행
+
+1. Visual Studio 2022에서 `DirectX11Workspace.sln`을 엽니다.
+2. 구성을 `Debug | x64`로 설정합니다.
+3. 프로젝트를 빌드하고 실행합니다.
+
+Shader와 Texture를 상대 경로로 불러오므로 Visual Studio에서 프로젝트 디렉터리를 작업 경로로 실행해야 합니다.
+
+## 앞으로 개선할 점
+
+- Delta Time 기반 Transform 갱신
+- Mesh, Material, Shader 리소스 공유
+- 창 크기 변경에 따른 SwapChain 및 Viewport 재설정
+- Depth Buffer와 Camera 구현
+- Component 소유 관계 및 관리 기능 확장
+- DirectX Debug Layer와 오류 처리 강화

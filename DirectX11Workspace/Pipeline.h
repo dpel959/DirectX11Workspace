@@ -1,17 +1,17 @@
-#pragma once
+ï»¿#pragma once
 #include <memory>
 #include "ConstantBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "SamplerState.h"
 
-// ±»ÀÌ ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎÀ» Å¬·¡½º·Î ºĞ¸®ÇÏ´Â ÀÌÀ¯´Â, ÇÊ¿ä¸¶´Ù ·»´õ¸µÀ» ´Ù¸£°Ô ÇØÁÖ±â À§ÇØ¼­ÀÌ´Ù.
-// Áï, ¹°Ã¼¸¶´ÙÀÇ '³ª´Â ÀÌ·¯ÇÑ ¹öÆÛ, ½¦ÀÌ´õ, ÅØ½ºÃ³ÀÇ °íÀ¯ ¼³Á¤À¸·Î ±×·ÁÁö°í ½Í¾î¿ä' ÀÇ Á¤º¸.
-// ¿ÀÅ©¸¦ ±×¸±¶§ ¿ÀÅ©ÀÇ ¹öÆÛ, ÅØ½ºÃ³, ½¦ÀÌ´õ¸¦ ¼³Á¤ÇÏ°í ±× ÈÄ ¸ğµç ¿ÀÅ©¸¦ ±×¸®°í, ´ÙÀ½Àº ½½¶óÀÓ... ÀÌ·± ½ÄÀ¸·Î ÇÏ´Â °ÍÀÌ °ü¸®µµ ½±°í È¿À²ÀûÀÏ °ÍÀÌ´Ù.
-// ±»ÀÌ ´Ù¸¥ Á¤º¸µéÀÌ ÇÊ¿äÇÑ °ÍÀ» ½ºÀ§ÄªÇØ°¡¸é¼­ ¼º´É ³¶ºñÇÏ¸é¼­ ±×¸± ÇÊ¿ä´Â ¾øÀ¸´Ï±î.
+// êµ³ì´ ë Œë”ë§ íŒŒì´í”„ë¼ì¸ì„ í´ë˜ìŠ¤ë¡œ ë¶„ë¦¬í•˜ëŠ” ì´ìœ ëŠ”, í•„ìš”ë§ˆë‹¤ ë Œë”ë§ì„ ë‹¤ë¥´ê²Œ í•´ì£¼ê¸° ìœ„í•´ì„œì´ë‹¤.
+// ì¦‰, ë¬¼ì²´ë§ˆë‹¤ì˜ 'ë‚˜ëŠ” ì´ëŸ¬í•œ ë²„í¼, ì‰ì´ë”, í…ìŠ¤ì²˜ì˜ ê³ ìœ  ì„¤ì •ìœ¼ë¡œ ê·¸ë ¤ì§€ê³  ì‹¶ì–´ìš”' ì˜ ì •ë³´.
+// ì˜¤í¬ë¥¼ ê·¸ë¦´ë•Œ ì˜¤í¬ì˜ ë²„í¼, í…ìŠ¤ì²˜, ì‰ì´ë”ë¥¼ ì„¤ì •í•˜ê³  ê·¸ í›„ ëª¨ë“  ì˜¤í¬ë¥¼ ê·¸ë¦¬ê³ , ë‹¤ìŒì€ ìŠ¬ë¼ì„... ì´ëŸ° ì‹ìœ¼ë¡œ í•˜ëŠ” ê²ƒì´ ê´€ë¦¬ë„ ì‰½ê³  íš¨ìœ¨ì ì¼ ê²ƒì´ë‹¤.
+// êµ³ì´ ë‹¤ë¥¸ ì •ë³´ë“¤ì´ í•„ìš”í•œ ê²ƒì„ ìŠ¤ìœ„ì¹­í•´ê°€ë©´ì„œ ì„±ëŠ¥ ë‚­ë¹„í•˜ë©´ì„œ ê·¸ë¦´ í•„ìš”ëŠ” ì—†ìœ¼ë‹ˆê¹Œ.
 // 
-// ±×¸®°í, ÀÌ struct°¡ ±×°ÍÀ» ³ª´©´Â ¿ªÇÒÀ» ÇÑ´Ù. º¸Åë ½¦ÀÌ´õ´Â ¿ÀºêÁ§Æ®µéÀÌ °øÀ¯ÇØ¼­ »ç¿ë ÇÏ°í´Â ÇÑ´Ù. 
-// »ó¿ë ¿£ÁøÀÇ ½¦ÀÌ´õ¸¦ »ç¿ëÇÏ¸é °ø¿ë ½¦ÀÌ´õ ÇÏ³ª¸¦ ´ëºÎºĞÀÇ ¿ÀºêÁ§Æ®°¡ ¾²´Â °æ¿ìµµ ÈçÇÏ°í.
+// ê·¸ë¦¬ê³ , ì´ structê°€ ê·¸ê²ƒì„ ë‚˜ëˆ„ëŠ” ì—­í• ì„ í•œë‹¤. ë³´í†µ ì‰ì´ë”ëŠ” ì˜¤ë¸Œì íŠ¸ë“¤ì´ ê³µìœ í•´ì„œ ì‚¬ìš© í•˜ê³ ëŠ” í•œë‹¤. 
+// ìƒìš© ì—”ì§„ì˜ ì‰ì´ë”ë¥¼ ì‚¬ìš©í•˜ë©´ ê³µìš© ì‰ì´ë” í•˜ë‚˜ë¥¼ ëŒ€ë¶€ë¶„ì˜ ì˜¤ë¸Œì íŠ¸ê°€ ì“°ëŠ” ê²½ìš°ë„ í”í•˜ê³ .
 
 class InputLayout;
 class VertexShader;
@@ -19,7 +19,7 @@ class RasterizerState;
 class PixelShader;
 class BlendState;
 
-// ¹«Á¶°ÇÀûÀ¸·Î »ç¿ëÇÏ´Â °ø¿ë ÀÚ¿øµéÀ» PipelineInfo¿¡ µé°í ÀÖ´Â´Ù.
+// ë¬´ì¡°ê±´ì ìœ¼ë¡œ ì‚¬ìš©í•˜ëŠ” ê³µìš© ìì›ë“¤ì„ PipelineInfoì— ë“¤ê³  ìˆëŠ”ë‹¤.
 
 struct PipelineInfo
 {
@@ -39,20 +39,21 @@ public:
 
 	void UpdatePipeline(PipelineInfo info);
 
-	// ÀÌ ¹Ø »çÇ×µéÀÌ PipelineInfo¿¡ µé¾î°¡ ÀÖÁö ¾ÊÀº ÀÌÀ¯´Â, ÇÊ¼ö°¡ ¾Æ´Ñ ¼±ÅÃÀû »çÇ×ÀÌ±â ¶§¹®ÀÌ´Ù.
+	// ì´ ë°‘ ì‚¬í•­ë“¤ì´ PipelineInfoì— ë“¤ì–´ê°€ ìˆì§€ ì•Šì€ ì´ìœ ëŠ”, í•„ìˆ˜ê°€ ì•„ë‹Œ ì„ íƒì  ì‚¬í•­ì´ê¸° ë•Œë¬¸ì´ë‹¤.
 	void SetVertexBuffer(const std::shared_ptr<VertexBuffer>& buffer);
 	void SetIndexbuffer(const std::shared_ptr<IndexBuffer>& buffer);
 
-	// slot¿¡ _constantBufferÀÇ Buffer ³»¿ë µî·Ï! 
-	// ShaderScope °¡ ÇÊ¿äÇÑ ÀÌÀ¯. ConstantBufferÀº VS¿¡, È¤Àº PS¿¡ µé¾î°¥ ¼öµµ ÀÖÀ¸¹Ç·Î ±×°É °É·¯³½´Ù.
+	// slotì— _constantBufferì˜ Buffer ë‚´ìš© ë“±ë¡! 
+	// ShaderScope ê°€ í•„ìš”í•œ ì´ìœ . ConstantBufferì€ VSì—, í˜¹ì€ PSì— ë“¤ì–´ê°ˆ ìˆ˜ë„ ìˆìœ¼ë¯€ë¡œ ê·¸ê±¸ ê±¸ëŸ¬ë‚¸ë‹¤.
 	template<typename T>
 	void SetConstantBuffer(uint32 slot, ShaderScope scope, const std::shared_ptr<ConstantBuffer<T>>& buffer)
 	{
+		// scopeì—ëŠ” ë‘ ë‹¨ê³„ê°€ ë™ì‹œì— ë“¤ì–´ì˜¬ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ê°ê° ë…ë¦½ì ìœ¼ë¡œ ê²€ì‚¬í•œë‹¤.
 		if ((scope & ShaderScope::VertexShader) != ShaderScope::None)
 		{
 			_deviceContext->VSSetConstantBuffers(slot, 1, buffer->GetComPtr().GetAddressOf());
 		}
-		else if ((scope & ShaderScope::PixelShader) != ShaderScope::None)
+		if ((scope & ShaderScope::PixelShader) != ShaderScope::None)
 		{
 			_deviceContext->PSSetConstantBuffers(slot, 1, buffer->GetComPtr().GetAddressOf());
 		}
@@ -61,36 +62,38 @@ public:
 
 	void SetTexture(uint32 slot, ShaderScope scope, const std::shared_ptr<Texture>& texture)
 	{
+		// scopeì—ëŠ” ë‘ ë‹¨ê³„ê°€ ë™ì‹œì— ë“¤ì–´ì˜¬ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ê°ê° ë…ë¦½ì ìœ¼ë¡œ ê²€ì‚¬í•œë‹¤.
 		if ((scope & ShaderScope::VertexShader) != ShaderScope::None)
 		{
-			_deviceContext->VSSetShaderResources(slot, 1, texture->GetComPtr().GetAddressOf());// ¸Ç ¾ÕÀº ¼ÎÀÌ´õ ÀÎµ¦½º. (t0, t1)
+			_deviceContext->VSSetShaderResources(slot, 1, texture->GetComPtr().GetAddressOf());// ë§¨ ì•ì€ ì…°ì´ë” ì¸ë±ìŠ¤. (t0, t1)
 		}
-		else if ((scope & ShaderScope::PixelShader) != ShaderScope::None)
+		if ((scope & ShaderScope::PixelShader) != ShaderScope::None)
 		{
-			_deviceContext->PSSetShaderResources(slot, 1, texture->GetComPtr().GetAddressOf());// ¸Ç ¾ÕÀº ¼ÎÀÌ´õ ÀÎµ¦½º. (t0, t1)
+			_deviceContext->PSSetShaderResources(slot, 1, texture->GetComPtr().GetAddressOf());// ë§¨ ì•ì€ ì…°ì´ë” ì¸ë±ìŠ¤. (t0, t1)
 		}
 	}
 
 	void SetSamplerState(uint32 slot, ShaderScope scope, const std::shared_ptr<SamplerState>& samplerState)
 	{
+		// scopeì—ëŠ” ë‘ ë‹¨ê³„ê°€ ë™ì‹œì— ë“¤ì–´ì˜¬ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ê°ê° ë…ë¦½ì ìœ¼ë¡œ ê²€ì‚¬í•œë‹¤.
 		if ((scope & ShaderScope::VertexShader) != ShaderScope::None)
 		{
-			_deviceContext->VSSetSamplers(0, 1, samplerState->GetComPtr().GetAddressOf());
+			_deviceContext->VSSetSamplers(slot, 1, samplerState->GetComPtr().GetAddressOf());
 		}
-		else if ((scope & ShaderScope::PixelShader) != ShaderScope::None)
+		if ((scope & ShaderScope::PixelShader) != ShaderScope::None)
 		{
-			_deviceContext->PSSetSamplers(0, 1, samplerState->GetComPtr().GetAddressOf());
+			_deviceContext->PSSetSamplers(slot, 1, samplerState->GetComPtr().GetAddressOf());
 		}
 	}
 
 	void Draw(uint32 vertexCount, uint32 startVertexLocation)
 	{
-		_deviceContext->Draw(vertexCount, startVertexLocation); // Á¤Á¡¸¸ »ç¿ëÇØ¼­ Draw
+		_deviceContext->Draw(vertexCount, startVertexLocation); // ì •ì ë§Œ ì‚¬ìš©í•´ì„œ Draw
 	}
 
 	void DrawIndexed(uint32 indexCount, uint32 startindexLocation, uint32 baseVertexLocation)
 	{
-		_deviceContext->DrawIndexed(indexCount, startindexLocation, baseVertexLocation); // ÀÎµ¦½º Á¤º¸¸¦ »ç¿ëÇØ¼­ Draw
+		_deviceContext->DrawIndexed(indexCount, startindexLocation, baseVertexLocation); // ì¸ë±ìŠ¤ ì •ë³´ë¥¼ ì‚¬ìš©í•´ì„œ Draw
 	}
 
 private:

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Types.h"
 
 const int32 GWinSizeX = 800;

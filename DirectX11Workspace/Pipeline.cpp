@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Pipeline.h"
 #include "RasterizerState.h"
 #include "BlendState.h"
@@ -12,22 +12,22 @@ Pipeline::~Pipeline()
 {
 }
 
-// °øÅëÀûÀÎ ºÎºĞÀº PipelineInfo·Î Ã¤¿öÁÖ°í, ³ª¸ÓÁö ¼±ÅÃÀû ÀÛ¾÷Àº ÇÊ¿äÇÒ¶§ Ã¤¿öÁØ´Ù.
+// ê³µí†µì ì¸ ë¶€ë¶„ì€ PipelineInfoë¡œ ì±„ì›Œì£¼ê³ , ë‚˜ë¨¸ì§€ ì„ íƒì  ì‘ì—…ì€ í•„ìš”í• ë•Œ ì±„ì›Œì¤€ë‹¤.
 void Pipeline::UpdatePipeline(PipelineInfo info)
 {
-	// ½ÇÁ¦ ±×¸®´Â ÀÛ¾÷.
+	// ì‹¤ì œ ê·¸ë¦¬ëŠ” ì‘ì—….
 	// IA - VS - RS - PS - OM
 
 	// IA
 
-	// 'Á¤Á¡ ÇÏ³ª'¿¡ µé¾î°£ µ¥ÀÌÅÍ´Â ¾î¶² ½ÄÀ¸·Î ÇØ¼®ÇØ?
+	// 'ì •ì  í•˜ë‚˜'ì— ë“¤ì–´ê°„ ë°ì´í„°ëŠ” ì–´ë–¤ ì‹ìœ¼ë¡œ í•´ì„í•´?
 	_deviceContext->IASetInputLayout(info.inputLayout->GetComPtr().Get());
-	// ÀÚ ÀĞ¾îÁÖ½Å µ¥ÀÌÅÍ´Â »ï°¢ÇüÀ¸·Î ÀÎ½ÄÇØÁÖ¼¼¿ä.
-	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	// ì ì½ì–´ì£¼ì‹  ë°ì´í„°ëŠ” ì‚¼ê°í˜•ìœ¼ë¡œ ì¸ì‹í•´ì£¼ì„¸ìš”.
+	_deviceContext->IASetPrimitiveTopology(info.topology);
 
 	// VS
 
-	// GPU ³×°¡ ÀÌ ¼ÎÀÌ´õ·Î ÀÏÇßÀ¸¸é ÁÁ°Ú¾î
+	// GPU ë„¤ê°€ ì´ ì…°ì´ë”ë¡œ ì¼í–ˆìœ¼ë©´ ì¢‹ê² ì–´
 	if (info.vertexShader)
 	{
 		_deviceContext->VSSetShader(info.vertexShader->GetComPtr().Get(), nullptr, 0);
@@ -54,7 +54,7 @@ void Pipeline::UpdatePipeline(PipelineInfo info)
 
 }
 
-// ¾î¶² ¹öÅØ½º ¹öÆÛ¸¦ ¼¼ÆÃÇØÁÙ°Å¾ß?
+// ì–´ë–¤ ë²„í…ìŠ¤ ë²„í¼ë¥¼ ì„¸íŒ…í•´ì¤„ê±°ì•¼?
 void Pipeline::SetVertexBuffer(const std::shared_ptr<VertexBuffer>& buffer)
 {
 	uint32 stride = buffer->GetStride();
@@ -62,7 +62,7 @@ void Pipeline::SetVertexBuffer(const std::shared_ptr<VertexBuffer>& buffer)
 	_deviceContext->IASetVertexBuffers(0, 1, buffer->GetComPtr().GetAddressOf(), &stride, &offset);
 }
 
-// ±× ¹öÅØ½ºµé ¾î¶² ¼ø¼­·Î ÀĞÀ» °Å¾ß? = ÀÎµ¦½º ¹öÆÛ ¼¼ÆÃ
+// ê·¸ ë²„í…ìŠ¤ë“¤ ì–´ë–¤ ìˆœì„œë¡œ ì½ì„ ê±°ì•¼? = ì¸ë±ìŠ¤ ë²„í¼ ì„¸íŒ…
 void Pipeline::SetIndexbuffer(const std::shared_ptr<IndexBuffer>& buffer)
 {
 	_deviceContext->IASetIndexBuffer(buffer->GetComPtr().Get(), DXGI_FORMAT_R32_UINT, 0);

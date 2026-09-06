@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 class BlendState
 {
 public:
 	BlendState(ComPtr<ID3D11Device> device);
 	~BlendState();
 
-	const float* GetBlendFactor() const { return &_blendFactor; }
+	const float* GetBlendFactor() const { return _blendFactor; }
 	uint32 GetSampleMask() const { return _sampleMask; }
 	const ComPtr<ID3D11BlendState>& GetComPtr() const { return _blendState; }
 
@@ -26,6 +26,6 @@ private:
 	ComPtr<ID3D11Device> _device;
 	ComPtr<ID3D11BlendState> _blendState;
 
-	float _blendFactor = 0.f;
+	float _blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
 	uint32 _sampleMask = 0xFFFFFFFF;
 };

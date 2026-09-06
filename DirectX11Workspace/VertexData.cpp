@@ -1,17 +1,17 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "VertexData.h"
 
 std::vector<D3D11_INPUT_ELEMENT_DESC> VertexTextureData::descs
 {
-	// ¹Ø¿¡ ½áµÎ´Â POSITION, COLOR °°Àº ÀÌ¸§Àº ±Ô¾àÀº ¾Æ´Ï°í, HLSL°ú ¿¬µ¿ÇÏ±â À§ÇØ ÀúÀåÇÏ´Â ÀÌ¸§
-	{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // Áö±Ý ³Ñ±æ ¹öÆÛ¿¡ float,float,float´Â POSITION µ¥ÀÌÅÍ¿¡¿ä
-	{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0} // !!Áß¿ä!! ¾ÕÀÇ 12¹ÙÀÌÆ®¸¦ POSITIONÀÌ ¸Ô¾úÀ¸´Ï, ÀúÈñ 12¹ÙÀÌÆ®ºÎÅÍ ½ÃÀÛÇØ¿ä
+	// ë°‘ì— ì¨ë‘ëŠ” POSITION, COLOR ê°™ì€ ì´ë¦„ì€ ê·œì•½ì€ ì•„ë‹ˆê³ , HLSLê³¼ ì—°ë™í•˜ê¸° ìœ„í•´ ì €ìž¥í•˜ëŠ” ì´ë¦„
+	{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // ì§€ê¸ˆ ë„˜ê¸¸ ë²„í¼ì— float,float,floatëŠ” POSITION ë°ì´í„°ì—ìš”
+	{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0} // !!ì¤‘ìš”!! ì•žì˜ 12ë°”ì´íŠ¸ë¥¼ POSITIONì´ ë¨¹ì—ˆìœ¼ë‹ˆ, ì €í¬ 12ë°”ì´íŠ¸ë¶€í„° ì‹œìž‘í•´ìš”
 };
-// D3D11_APPEND_ALIGNED_ELEMENT - ¾Ë¾Æ¼­ Å©±â¸¦ ±¸ÇØ Ã¤¿öÁØ´Ù.
+// D3D11_APPEND_ALIGNED_ELEMENT - ì•Œì•„ì„œ í¬ê¸°ë¥¼ êµ¬í•´ ì±„ì›Œì¤€ë‹¤.
 
 std::vector<D3D11_INPUT_ELEMENT_DESC> VertexColorData::descs
 {
-	// ¹Ø¿¡ ½áµÎ´Â POSITION, COLOR °°Àº ÀÌ¸§Àº ±Ô¾àÀº ¾Æ´Ï°í, HLSL°ú ¿¬µ¿ÇÏ±â À§ÇØ ÀúÀåÇÏ´Â ÀÌ¸§
-	{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // Áö±Ý ³Ñ±æ ¹öÆÛ¿¡ float,float,float´Â POSITION µ¥ÀÌÅÍ¿¡¿ä
-	{"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0} // !!Áß¿ä!! ¾ÕÀÇ 12¹ÙÀÌÆ®¸¦ POSITIONÀÌ ¸Ô¾úÀ¸´Ï, ÀúÈñ 12¹ÙÀÌÆ®ºÎÅÍ ½ÃÀÛÇØ¿ä
+	// ë°‘ì— ì¨ë‘ëŠ” POSITION, COLOR ê°™ì€ ì´ë¦„ì€ ê·œì•½ì€ ì•„ë‹ˆê³ , HLSLê³¼ ì—°ë™í•˜ê¸° ìœ„í•´ ì €ìž¥í•˜ëŠ” ì´ë¦„
+	{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, // ì§€ê¸ˆ ë„˜ê¸¸ ë²„í¼ì— float,float,floatëŠ” POSITION ë°ì´í„°ì—ìš”
+	{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0} // !!ì¤‘ìš”!! ì•žì˜ 12ë°”ì´íŠ¸ë¥¼ POSITIONì´ ë¨¹ì—ˆìœ¼ë‹ˆ, ì €í¬ 12ë°”ì´íŠ¸ë¶€í„° ì‹œìž‘í•´ìš”
 };

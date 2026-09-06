@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "GameObject.h"
 #include "GeometryHelper.h"
 #include "Shader.h"
@@ -12,13 +12,13 @@
 GameObject::GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext)
 	:_device(device)
 {
-	//--- ±âÇÏ(µµÇü) ¸¸µé±â
+	//--- ê¸°í•˜(ë„í˜•) ë§Œë“¤ê¸°
 	_geometry = std::make_shared<Geometry<VertexTextureData>>();
 	//_geometry = std::make_shared<Geometry<VertexColorData>>();
 	GeometryHelper::CreateRectangle(_geometry);
 	//GeometryHelper::CreateRectangle(_geometry, Color{1.f, 1.f, 1.f, 1.f});
 
-	// ¹öÅØ½ºµéÀÇ µ¥ÀÌÅÍ! ÀÌ°Ç CPU¿¡ ÀúÀåÇÏ¹Ç·Î, ¾ÆÁ÷ CPUÀÇ ¿µ¿ª = RAM¿¡ ÀúÀåµÊ.
+	// ë²„í…ìŠ¤ë“¤ì˜ ë°ì´í„°! ì´ê±´ CPUì— ì €ì¥í•˜ë¯€ë¡œ, ì•„ì§ CPUì˜ ì˜ì—­ = RAMì— ì €ì¥ë¨.
 	_vertexBuffer = std::make_shared<VertexBuffer>(device);
 	_vertexBuffer->Create(_geometry->GetVertices());
 
@@ -28,8 +28,8 @@ GameObject::GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> 
 	_vertexShader = std::make_shared<VertexShader>(device);
 	_vertexShader->Create(L"Default.hlsl", "VS", "vs_5_0");
 
-	// ¾ÆÁ÷±îÁöµµ GPU ÀÔÀå¿¡¼­ ¹öÅØ½º ¹öÆÛ´Â ±×³É µ¥ÀÌÅÍ ÂÉ°¡¸®ÀÓ. ÀÌ°É·Î ¹» ÇÏ¶ó°í?¸¦ ¾Ë·ÁÁÜ
-	// ½ÇÇà ´Ü°è¿Í ´Ù¸£°Ô, »ı¼º¿¡¼­´Â InputLayoutÀº VSº¸´Ù µÚ¿¡ ¸¸µé¾î¾ßÇÑ´Ù. vsBlobÀÌ ÇÊ¿äÇØ¼­...
+	// ì•„ì§ê¹Œì§€ë„ GPU ì…ì¥ì—ì„œ ë²„í…ìŠ¤ ë²„í¼ëŠ” ê·¸ëƒ¥ ë°ì´í„° ìª¼ê°€ë¦¬ì„. ì´ê±¸ë¡œ ë­˜ í•˜ë¼ê³ ?ë¥¼ ì•Œë ¤ì¤Œ
+	// ì‹¤í–‰ ë‹¨ê³„ì™€ ë‹¤ë¥´ê²Œ, ìƒì„±ì—ì„œëŠ” InputLayoutì€ VSë³´ë‹¤ ë’¤ì— ë§Œë“¤ì–´ì•¼í•œë‹¤. vsBlobì´ í•„ìš”í•´ì„œ...
 
 	_inputLayout = std::make_shared<InputLayout>(device);
 	_inputLayout->Create(VertexTextureData::descs, _vertexShader->GetBlob());
@@ -79,7 +79,7 @@ void GameObject::Update(bool isParent)
 	{
 		Quaternion rot = _transform->GetRotation();
 
-		// ÄõÅÍ´Ï¾ğÀº 4Â÷¿ø º¯¼öÀÎ w°¡ ÀÖ°í, °ö¼ÁÀ¸·Î °¢µµ¸¦ ¿òÁ÷¿©¼­, Á» ÇÏ±â ¹ø°Å·Ó´Ù.
+		// ì¿¼í„°ë‹ˆì–¸ì€ 4ì°¨ì› ë³€ìˆ˜ì¸ wê°€ ìˆê³ , ê³±ì…‰ìœ¼ë¡œ ê°ë„ë¥¼ ì›€ì§ì—¬ì„œ, ì¢€ í•˜ê¸° ë²ˆê±°ë¡­ë‹¤.
 		Quaternion deltaRot = Quaternion::CreateFromAxisAngle(Vec3::Backward, 0.001f);
 
 		rot *= deltaRot;

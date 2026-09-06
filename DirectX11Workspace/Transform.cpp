@@ -1,5 +1,6 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Transform.h"
+#include <algorithm>
 
 Transform::Transform()
 {
@@ -18,64 +19,92 @@ void Transform::Update()
 {
 }
 
+void Transform::SetParent(const std::shared_ptr<Transform>& parent)
+{
+	const std::shared_ptr<Transform> currentParent = _parent.lock();
+	if (currentParent == parent)
+	{
+		return;
+	}
+
+	const std::shared_ptr<Transform> self = shared_from_this();
+
+	if (currentParent)
+	{
+		auto& siblings = currentParent->_children;
+		siblings.erase(
+			std::remove(siblings.begin(), siblings.end(), self),
+			siblings.end());
+	}
+
+	_parent = parent;
+
+	if (parent)
+	{
+		parent->_children.push_back(self);
+	}
+
+	UpdateTransform();
+}
+
 void Transform::UpdateTransform()
 {
 	Matrix matScale = Matrix::CreateScale(_localScale);
 	Matrix matRotation = Matrix::CreateFromQuaternion(_localRotation);
 	Matrix matTranslation = Matrix::CreateTranslation(_localPosition);
 
-	_localMat = matScale * matRotation * matTranslation; // ÀÚ½ÅÀÇ ºÎ¸ğ ÁÂÇ¥°è·Î ¿Ã¶ó°¡´Â º¯È¯Çà·Ä
-	if (HasParent())
+	_localMat = matScale * matRotation * matTranslation; // ìì‹ ì˜ ë¶€ëª¨ ì¢Œí‘œê³„ë¡œ ì˜¬ë¼ê°€ëŠ” ë³€í™˜í–‰ë ¬
+	if (const std::shared_ptr<Transform> parent = _parent.lock())
 	{
-		_worldMat = _localMat * _parent->GetWorldmatrix(); // _worldMat´Â ¸» ±×´ë·Î ³ª·ÎºÎÅÍ world±îÁö º¯ÇÏ´Â º¯È¯ Çà·ÄÀÌ´Ù.
-		// '³» ºÎ¸ğÀÇ worldMat'µµ 'ÀÚ½ÅºÎÅÍ world±îÁöÀÇ º¯È¯ Çà·Ä'À» °¡Áö°í ÀÖÀ» °ÍÀÌ¹Ç·Î, ±×°É °öÇÏ¸é ¹Ù·Î world ÁÂÇ¥°è·Î °¡´Â °ÍÀÌ´Ù.
+		_worldMat = _localMat * parent->GetWorldmatrix(); // _worldMatëŠ” ë§ ê·¸ëŒ€ë¡œ ë‚˜ë¡œë¶€í„° worldê¹Œì§€ ë³€í•˜ëŠ” ë³€í™˜ í–‰ë ¬ì´ë‹¤.
+		// 'ë‚´ ë¶€ëª¨ì˜ worldMat'ë„ 'ìì‹ ë¶€í„° worldê¹Œì§€ì˜ ë³€í™˜ í–‰ë ¬'ì„ ê°€ì§€ê³  ìˆì„ ê²ƒì´ë¯€ë¡œ, ê·¸ê±¸ ê³±í•˜ë©´ ë°”ë¡œ world ì¢Œí‘œê³„ë¡œ ê°€ëŠ” ê²ƒì´ë‹¤.
 	}
 	else
 	{
 		_worldMat = _localMat;
 	}
 	
-	// º¸Åë Çà·ÄÀÌ
-	// [Rx, Ry, Rz, 0] -> Right º¤ÅÍ
-	// [Ux, Uy, Uz, 0] -> Up º¤ÅÍ
-	// [Lx, Ly, Lz, 0] -> Look º¤ÅÍ
-	// [Tx, Ty, Tz, 0] -> ÀÌµ¿
+	// ë³´í†µ í–‰ë ¬ì´
+	// [Rx, Ry, Rz, 0] -> Right ë²¡í„°
+	// [Ux, Uy, Uz, 0] -> Up ë²¡í„°
+	// [Lx, Ly, Lz, 0] -> Look ë²¡í„°
+	// [Tx, Ty, Tz, 0] -> ì´ë™
 
-	// ÀÌ·¸°Ô µÇ¾îÀÖ´Ù. ÀÌ¶§ ½ºÄÉÀÏÀÌ µÇ¾îÀÖ°í ¸»°í´Â Å« »ó°üÀÌ ¾ø´Ù. ±¸ÇÑ right, up, look º¤ÅÍ°¡ ´ÜÀ§ º¤ÅÍ°¡ ¾Æ´Ò »Ó.
+	// ì´ë ‡ê²Œ ë˜ì–´ìˆë‹¤. ì´ë•Œ ìŠ¤ì¼€ì¼ì´ ë˜ì–´ìˆê³  ë§ê³ ëŠ” í° ìƒê´€ì´ ì—†ë‹¤. êµ¬í•œ right, up, look ë²¡í„°ê°€ ë‹¨ìœ„ ë²¡í„°ê°€ ì•„ë‹ ë¿.
 
-	// ¶ÇÇÑ, ÀÌ·¯ÇÑ ¿Ï¼ºµÈ Çà·Ä¿¡¼­ Decompose(ºĞÇØ)¸¦ ÇØÁÖ°Å³ª, Á¤±ÔÈ­ µîÀÇ ¿©·¯ Æí¸® ÇÔ¼öµéÀÌ ÀÖ´Ù.
+	// ë˜í•œ, ì´ëŸ¬í•œ ì™„ì„±ëœ í–‰ë ¬ì—ì„œ Decompose(ë¶„í•´)ë¥¼ í•´ì£¼ê±°ë‚˜, ì •ê·œí™” ë“±ì˜ ì—¬ëŸ¬ í¸ë¦¬ í•¨ìˆ˜ë“¤ì´ ìˆë‹¤.
 
-	// Decompose´Â Vec3, Quaternion, Vec3·Î ÇØÁØ´Ù.
+	// DecomposeëŠ” Vec3, Quaternion, Vec3ë¡œ í•´ì¤€ë‹¤.
 
 	_worldMat.Decompose(_scale, _rotation, _position);
 
-	// º¤ÅÍ * Çà·Ä °ö ÇÔ¼ö 
-	// TransformCoord: Çà·Ä ¸¶Áö¸· ÇàÀ» Tx, Ty, Tz, 1À¸·Î ÇÑ´Ù. (ÀÌµ¿ Àû¿ë = Æ÷Áö¼ÇÈ­)
-	// TransformNormal: Çà·Ä ¸¶Áö¸· ÇàÀ» Tx, Ty, Tz, 0À¸·Î ÇÑ´Ù. (ÀÌµ¿ ¹ÌÀû¿ë = ¹æÇâº¤ÅÍÈ­)
+	// ë²¡í„° * í–‰ë ¬ ê³± í•¨ìˆ˜ 
+	// TransformCoord: í–‰ë ¬ ë§ˆì§€ë§‰ í–‰ì„ Tx, Ty, Tz, 1ìœ¼ë¡œ í•œë‹¤. (ì´ë™ ì ìš© = í¬ì§€ì…˜í™”)
+	// TransformNormal: í–‰ë ¬ ë§ˆì§€ë§‰ í–‰ì„ Tx, Ty, Tz, 0ìœ¼ë¡œ í•œë‹¤. (ì´ë™ ë¯¸ì ìš© = ë°©í–¥ë²¡í„°í™”)
 
-	// ±×¸®°í, ¾Ë¾ÆµÖ¾ß ÇÒ ºñº¸°¡ ÀÖ´Ù. SimpleMath::Vector3¿¡´Â Right, Up, Forward, Backward°¡ ÀÖ´Ù.
-	// ±×·±µ¥, Forward´Â 0.f 0.f, -1.fÀÌ´Ù. SimpleMath´Â '¿À¸¥¼Õ ÁÂÇ¥°è'¸¦ µû¸¥´Ù.
-	// ±×·¯¹Ç·Î ¿ì¸®´Â 0.f, 0.f, 1.fÀÎ Backward¸¦ »ç¿ëÇØÁÖ¾î¾ßÇÑ´Ù.
+	// ê·¸ë¦¬ê³ , ì•Œì•„ë‘¬ì•¼ í•  ë¹„ë³´ê°€ ìˆë‹¤. SimpleMath::Vector3ì—ëŠ” Right, Up, Forward, Backwardê°€ ìˆë‹¤.
+	// ê·¸ëŸ°ë°, ForwardëŠ” 0.f 0.f, -1.fì´ë‹¤. SimpleMathëŠ” 'ì˜¤ë¥¸ì† ì¢Œí‘œê³„'ë¥¼ ë”°ë¥¸ë‹¤.
+	// ê·¸ëŸ¬ë¯€ë¡œ ìš°ë¦¬ëŠ” 0.f, 0.f, 1.fì¸ Backwardë¥¼ ì‚¬ìš©í•´ì£¼ì–´ì•¼í•œë‹¤.
 
 	_right = Vec3::TransformNormal(Vec3::Right, _worldMat);
 	_up = Vec3::TransformNormal(Vec3::Up, _worldMat);
 	_look = Vec3::TransformNormal(Vec3::Backward, _worldMat);
 
-	// ³» À§Ä¡°¡ ¹Ù²î¸é, ³» SRT (º¯È¯ Çà·Ä)ÀÌ ¹Ù²ï °Í. Áï childÀÇ À§Ä¡µéµµ ¹Ù²î¾î¾ßÇÏ¹Ç·Î ³» childrenµµ ¾÷µ¥ÀÌÆ®ÇØÁØ´Ù.
-	// child°¡ child¸¦ È£ÃâÇÏ°í, Àç±ÍÀûÀ¸·Î È£ÃâµÇ´Â ±¸Á¶ÀÌ´Ù.
+	// ë‚´ ìœ„ì¹˜ê°€ ë°”ë€Œë©´, ë‚´ SRT (ë³€í™˜ í–‰ë ¬)ì´ ë°”ë€ ê²ƒ. ì¦‰ childì˜ ìœ„ì¹˜ë“¤ë„ ë°”ë€Œì–´ì•¼í•˜ë¯€ë¡œ ë‚´ childrenë„ ì—…ë°ì´íŠ¸í•´ì¤€ë‹¤.
+	// childê°€ childë¥¼ í˜¸ì¶œí•˜ê³ , ì¬ê·€ì ìœ¼ë¡œ í˜¸ì¶œë˜ëŠ” êµ¬ì¡°ì´ë‹¤.
 	for (const std::shared_ptr<Transform>& child : _children)
 	{
 		child->UpdateTransform();
 	}
 }
 
-// ¿©±â¼­ worldScaleÀº 'world¿¡¼­ ºÃÀ» ¶§ Àı´ëÀû Scale'À» ¶æ ÇÔ
-// ³»°¡ ¿øÇÏ´Â world °üÁ¡¿¡¼­ÀÇ'Àı´ëÀûÀÎ Å©±â'°¡ 1ÀÌ¾îµµ, parentScaleÀÌ 0.5¸é, ³» ½ºÄÉÀÏÀº 2°¡ µÈ´Ù.
+// ì—¬ê¸°ì„œ worldScaleì€ 'worldì—ì„œ ë´¤ì„ ë•Œ ì ˆëŒ€ì  Scale'ì„ ëœ» í•¨
+// ë‚´ê°€ ì›í•˜ëŠ” world ê´€ì ì—ì„œì˜'ì ˆëŒ€ì ì¸ í¬ê¸°'ê°€ 1ì´ì–´ë„, parentScaleì´ 0.5ë©´, ë‚´ ìŠ¤ì¼€ì¼ì€ 2ê°€ ëœë‹¤.
 void Transform::SetScale(const Vec3& worldScale)
 {
-	if (HasParent())
+	if (const std::shared_ptr<Transform> parent = _parent.lock())
 	{
-		Vec3 parentScale = _parent->GetScale();
+		Vec3 parentScale = parent->GetScale();
 		Vec3 scale = worldScale;
 		scale.x /= parentScale.x; 
 		scale.y /= parentScale.y;
@@ -90,9 +119,9 @@ void Transform::SetScale(const Vec3& worldScale)
 
 void Transform::SetRotation(const Quaternion& worldRotation)
 {
-	if (HasParent())
+	if (const std::shared_ptr<Transform> parent = _parent.lock())
 	{
-		Quaternion invParentRot = XMQuaternionInverse(_parent->GetRotation()); // ÄõÅÍ´Ï¾ğÀº ³¯¸ÔÀÌ µÈ´Ù.
+		Quaternion invParentRot = XMQuaternionInverse(parent->GetRotation()); // ì¿¼í„°ë‹ˆì–¸ì€ ë‚ ë¨¹ì´ ëœë‹¤.
 		SetLocalRotation(worldRotation * invParentRot);
 	}
 	else
@@ -103,23 +132,23 @@ void Transform::SetRotation(const Quaternion& worldRotation)
 
 void Transform::SetPosition(const Vec3& worldPosition)
 {
-	if (HasParent())
+	if (const std::shared_ptr<Transform> parent = _parent.lock())
 	{
 		// Vec3 parentPosition = _parent->GetPosition();
 		// worldPosition - parentPosition;
-		// ÀÌ·¸°Ô ÇÏ¸é µÇÁö ¾Ê³ª¿ä. ¿Ö ÀÌ·¸°Ô ¾î·Æ°Ô ÇÏ³ª¿ä! ÇÏ¸é. ÀÌ ³ªÀÇ localPositionÀÌ¶ó´Â °Í ÀÚÃ¼°¡
-		// ºÎ¸ğÀÇ ÁÂÇ¥°è¿¡¼­ Ç¥ÇöµÈ position ÀÌ±â ¶§¹®ÀÌ´Ù. Áï, ºÎ¸ğÀÇ ScaleÀÌ³ª Rotationµµ ¿µÇâÀ» ¹ŞÀº »óÅÂÀÇ translationÀÌ´Ù. ¼ø¼­°¡ S->R->T´Ï±î!
-		// ·ÎÄÃ¿¡¼­ ¿ùµå·Î ÇâÇÏ´Â Çà·ÄÀÌ SRT¸é, ¿ùµå¿¡¼­ ·ÎÄÃ·Î ÇâÇÏ´Â ¿ªÇà¿­Àº T-1R-1S-1 ÀÌ´Ù. ±×·¯¸é Àú À§ÀÇ ½ÄÀº T-1 ¸¸ ÇØÁØ°ÍÀÌ´Ù. R-1, S-1µµ °öÇØÁÖ¾î¾ß ÇÏ´Â °ÍÀÌ´Ù!
+		// ì´ë ‡ê²Œ í•˜ë©´ ë˜ì§€ ì•Šë‚˜ìš”. ì™œ ì´ë ‡ê²Œ ì–´ë µê²Œ í•˜ë‚˜ìš”! í•˜ë©´. ì´ ë‚˜ì˜ localPositionì´ë¼ëŠ” ê²ƒ ìì²´ê°€
+		// ë¶€ëª¨ì˜ ì¢Œí‘œê³„ì—ì„œ í‘œí˜„ëœ position ì´ê¸° ë•Œë¬¸ì´ë‹¤. ì¦‰, ë¶€ëª¨ì˜ Scaleì´ë‚˜ Rotationë„ ì˜í–¥ì„ ë°›ì€ ìƒíƒœì˜ translationì´ë‹¤. ìˆœì„œê°€ S->R->Të‹ˆê¹Œ!
+		// ë¡œì»¬ì—ì„œ ì›”ë“œë¡œ í–¥í•˜ëŠ” í–‰ë ¬ì´ SRTë©´, ì›”ë“œì—ì„œ ë¡œì»¬ë¡œ í–¥í•˜ëŠ” ì—­í–‰ì—´ì€ T-1R-1S-1 ì´ë‹¤. ê·¸ëŸ¬ë©´ ì € ìœ„ì˜ ì‹ì€ T-1 ë§Œ í•´ì¤€ê²ƒì´ë‹¤. R-1, S-1ë„ ê³±í•´ì£¼ì–´ì•¼ í•˜ëŠ” ê²ƒì´ë‹¤!
 
-		// ±×·¯¹Ç·Î, ¿ªÇà·ÄÀ» ¾²´Â °ÍÀÌ ¸Â´Ù. À§ÀÇ °ÍÀº 'ÀÏºÎ'¸¸ ÇÑ °ÍÀÓ.
+		// ê·¸ëŸ¬ë¯€ë¡œ, ì—­í–‰ë ¬ì„ ì“°ëŠ” ê²ƒì´ ë§ë‹¤. ìœ„ì˜ ê²ƒì€ 'ì¼ë¶€'ë§Œ í•œ ê²ƒì„.
 
-		Matrix worldToParentLocalMatrix = _parent->GetWorldmatrix().Invert();
+		Matrix worldToParentLocalMatrix = parent->GetWorldmatrix().Invert();
 
-		// »ç½Ç Àü¿ª ¸»°í °´Ã¼¿¡¼­µµ TransformÀ» È£ÃâÇÒ ¼ö ÀÖ´Ù.
-		// Transform == TransformCoord¿Í °°Àº ¿ªÇÒÀ» ÇÏ°í, ÆÄ¶ó¹ÌÅÍ¸¦ ÇÏ³ª¸¸ ³ÖÀ¸¸é, ³ª¿Í Çà·ÄÀ» ¿¬»êÇØ ¹İÈ¯ÇÏ°í,
-		// ÆÄ¶ó¹ÌÅÍ¸¦ 2°³ (º¤ÅÍ, Çà·Ä)À» ³ÖÀ¸¸é, ±× °ªÀ» °è»êÇÏ¿© È£ÃâÇÑ º¤ÅÍ3 °´Ã¼¿¡°Ô ¹İÈ¯ÇÑ´Ù.
+		// ì‚¬ì‹¤ ì „ì—­ ë§ê³  ê°ì²´ì—ì„œë„ Transformì„ í˜¸ì¶œí•  ìˆ˜ ìˆë‹¤.
+		// Transform == TransformCoordì™€ ê°™ì€ ì—­í• ì„ í•˜ê³ , íŒŒë¼ë¯¸í„°ë¥¼ í•˜ë‚˜ë§Œ ë„£ìœ¼ë©´, ë‚˜ì™€ í–‰ë ¬ì„ ì—°ì‚°í•´ ë°˜í™˜í•˜ê³ ,
+		// íŒŒë¼ë¯¸í„°ë¥¼ 2ê°œ (ë²¡í„°, í–‰ë ¬)ì„ ë„£ìœ¼ë©´, ê·¸ ê°’ì„ ê³„ì‚°í•˜ì—¬ í˜¸ì¶œí•œ ë²¡í„°3 ê°ì²´ì—ê²Œ ë°˜í™˜í•œë‹¤.
 
-		// Àü¿ªÀ¸·Î ¹Ù·Î ÀÓ½Ã °´Ã¼·Î ¹İÈ¯ÇÏ´Â °Ô °¡Àå ±ò²ûÇÔ.
+		// ì „ì—­ìœ¼ë¡œ ë°”ë¡œ ì„ì‹œ ê°ì²´ë¡œ ë°˜í™˜í•˜ëŠ” ê²Œ ê°€ì¥ ê¹”ë”í•¨.
 
 		SetLocalPosition(Vec3::Transform(worldPosition, worldToParentLocalMatrix));
 	}

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 class IndexBuffer
 {
 public:
@@ -10,12 +10,12 @@ public:
 	uint32 GetOffset() const { return _offset; }
 	uint32 GetCount() const { return _count; }
 
-	// ÀÌ°Ç ÅÛÇÃ¸´ÀÏ ÇÊ¿ä ¾ø´Ù. ¾îÂ÷ÇÇ Á¤¼ö¸¸ ¹ŞÀ» °Å¶ó..
+	// ì´ê±´ í…œí”Œë¦¿ì¼ í•„ìš” ì—†ë‹¤. ì–´ì°¨í”¼ ì •ìˆ˜ë§Œ ë°›ì„ ê±°ë¼..
 	void Create(const std::vector<uint32>& indices);
 
 private:
 	ComPtr<ID3D11Device> _device;
-	ComPtr<ID3D11Buffer> _indexBuffer;  // ÀÎµ¦½º ¹öÆÛ.¾ó¸¶³ª Á¤Á¡À» ¸¹ÀÌ ÀÌ¿ëÇÏ´Â µµÇüÀ» ¸¸µé °ÍÀÌ³Ä¿¡ µû¶ó Á¤ÇØÁÖ¸é µÈ´Ù.
+	ComPtr<ID3D11Buffer> _indexBuffer;  // ì¸ë±ìŠ¤ ë²„í¼.ì–¼ë§ˆë‚˜ ì •ì ì„ ë§ì´ ì´ìš©í•˜ëŠ” ë„í˜•ì„ ë§Œë“¤ ê²ƒì´ëƒì— ë”°ë¼ ì •í•´ì£¼ë©´ ëœë‹¤.
 
 	uint32 _stride = 0;
 	uint32 _offset = 0;

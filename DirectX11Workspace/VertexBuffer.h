@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 class VertexBuffer
 {
 public:
@@ -10,7 +10,7 @@ public:
 	uint32 GetOffset() const { return _offset; }
 	uint32 GetCount() const { return _count; }
 
-	// ¿Ö ÅÛÇÃ¸´À¸·Î ÇØ¿ä? -> ¹öÅØ½º´Â ¿©·¯ ÇüÅÂ°¡ ÀÖÀ» ¼ö ÀÖÀ½. uv, color, Æ÷Áö¼Ç µî.
+	// ì™œ í…œí”Œë¦¿ìœ¼ë¡œ í•´ìš”? -> ë²„í…ìŠ¤ëŠ” ì—¬ëŸ¬ í˜•íƒœê°€ ìžˆì„ ìˆ˜ ìžˆìŒ. uv, color, í¬ì§€ì…˜ ë“±.
 	template<typename T>
 	void Create(const std::vector<T>& vertices)
 	{
@@ -20,35 +20,35 @@ public:
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		{
-			// ÀÌ°Å Áß¿ä!!! 'GPU¸¸ ÀÐÀ» ¼ö ÀÖ´Â' µ¥ÀÌÅÍ. ÇÏÁö¸¸ GPUµµ CPUµµ ¾²Áö ¸øÇÑ´Ù.
-			// GPU¿¡ ¹öÆÛ°¡ ¸¸µé¾î Áú°Çµ¥, ¾ê¸¦ ¾î¶»°Ô ¸¸µé°í, ÀÛ¾÷À» ÇÒ °ÅÀÓ?
-			// DEFAULT = GPU¸¸ ÀÐ°í ¾µ ¼ö ÀÖÀ½
-			// DYNAMIC = GPU´Â ÀÐ°í, CPU´Â ¾µ ¼ö¸¸ ÀÖ´Ù.
-			// STAGING = GPU¿¡¼­ CPU ·Î µ¥ÀÌÅÍ¸¦ Àü¼ÛÇÒ¶§ »ç¿ëµÈ´Ù.
+			// ì´ê±° ì¤‘ìš”!!! 'GPUë§Œ ì½ì„ ìˆ˜ ìžˆëŠ”' ë°ì´í„°. í•˜ì§€ë§Œ GPUë„ CPUë„ ì“°ì§€ ëª»í•œë‹¤.
+			// GPUì— ë²„í¼ê°€ ë§Œë“¤ì–´ ì§ˆê±´ë°, ì–˜ë¥¼ ì–´ë–»ê²Œ ë§Œë“¤ê³ , ìž‘ì—…ì„ í•  ê±°ìž„?
+			// DEFAULT = GPUë§Œ ì½ê³  ì“¸ ìˆ˜ ìžˆìŒ
+			// DYNAMIC = GPUëŠ” ì½ê³ , CPUëŠ” ì“¸ ìˆ˜ë§Œ ìžˆë‹¤.
+			// STAGING = GPUì—ì„œ CPU ë¡œ ë°ì´í„°ë¥¼ ì „ì†¡í• ë•Œ ì‚¬ìš©ëœë‹¤.
 
-			// ±Ùµ¥ Á¤Á¡ µ¥ÀÌÅÍ¸¦ ±»ÀÌ ¹Ù²Ü ÀÏÀÌ ¾øÀÝ¾Æ? ±×·¡¼­ IMMUTABLE
+			// ê·¼ë° ì •ì  ë°ì´í„°ë¥¼ êµ³ì´ ë°”ê¿€ ì¼ì´ ì—†ìž–ì•„? ê·¸ëž˜ì„œ IMMUTABLE
 			desc.Usage = D3D11_USAGE_IMMUTABLE;
-			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // ¾î¶»°Ô ¾µ °Å¿¡¿ä? = ¹öÅØ½º ¹öÆÛ·Î¿ä (³»°¡ ¾î¶»°Ô ÀÐÀ» Áö ¾Ë·ÁÁà.)
-			// ÅØ½ºÃ³ÀÇ ÇØ¼®±â°¡ ·»´õ Å¸°Ù ºä¶ó¸é, ¹öÆÛÀÇ ÇØ¼®±â´Â BindFlagsÀÓ.
-			desc.ByteWidth = static_cast<uint32>(_stride * _count); // »çÀÌÁî´Â?
+			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // ì–´ë–»ê²Œ ì“¸ ê±°ì—ìš”? = ë²„í…ìŠ¤ ë²„í¼ë¡œìš” (ë‚´ê°€ ì–´ë–»ê²Œ ì½ì„ ì§€ ì•Œë ¤ì¤˜.)
+			// í…ìŠ¤ì²˜ì˜ í•´ì„ê¸°ê°€ ë Œë” íƒ€ê²Ÿ ë·°ë¼ë©´, ë²„í¼ì˜ í•´ì„ê¸°ëŠ” BindFlagsìž„.
+			desc.ByteWidth = static_cast<uint32>(_stride * _count); // ì‚¬ì´ì¦ˆëŠ”?
 		}
 
-		// ±×·¡¼­ ½ÇÁ¦·Î CPUÀÇ ¾î¶² µ¥ÀÌÅÍ¸¦ ³Ñ°ÜÁÙ°Çµ¥? 
+		// ê·¸ëž˜ì„œ ì‹¤ì œë¡œ CPUì˜ ì–´ë–¤ ë°ì´í„°ë¥¼ ë„˜ê²¨ì¤„ê±´ë°? 
 
 		D3D11_SUBRESOURCE_DATA data;
 		ZeroMemory(&data, sizeof(data));
 		data.pSysMem = vertices.data(); // == &_vertices[0]
 
-		HRESULT hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf()); // CPU µ¥ÀÌÅÍ data¸¦ desc¿¡ µû¶ó _vertexBuffer·Î ¿Å°ÜÁà
+		HRESULT hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf()); // CPU ë°ì´í„° dataë¥¼ descì— ë”°ë¼ _vertexBufferë¡œ ì˜®ê²¨ì¤˜
 
 		assert(SUCCEEDED(hr));
 	}
 
 private:
-	ComPtr<ID3D11Device> _device; // ÂüÁ¶¿ë! ¹°·Ð ½Ì±ÛÅæÀ¸·Î ¸¸µé¾î³öµµ µÊ.
-	ComPtr<ID3D11Buffer> _vertexBuffer; // ÀÌÁ¦ GPUÀÇ VRAMÀ¸·Î ³Ñ°ÜÁÖ´Â °ÅÀÓ.
+	ComPtr<ID3D11Device> _device; // ì°¸ì¡°ìš©! ë¬¼ë¡  ì‹±ê¸€í†¤ìœ¼ë¡œ ë§Œë“¤ì–´ë†”ë„ ë¨.
+	ComPtr<ID3D11Buffer> _vertexBuffer; // ì´ì œ GPUì˜ VRAMìœ¼ë¡œ ë„˜ê²¨ì£¼ëŠ” ê±°ìž„.
 
-	// ÀÌ°Ç ³ªÁß¿¡µµ °øÅëÀûÀ¸·Î »ç¿ëÇØ¼­, ÀúÀåÇØÁÖÀÚ
+	// ì´ê±´ ë‚˜ì¤‘ì—ë„ ê³µí†µì ìœ¼ë¡œ ì‚¬ìš©í•´ì„œ, ì €ìž¥í•´ì£¼ìž
 	uint32 _stride = 0;
 	uint32 _offset = 0;
 	uint32 _count = 0;

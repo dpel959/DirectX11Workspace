@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "InputLayout.h"
 
 InputLayout::InputLayout(ComPtr<ID3D11Device> device)
@@ -10,14 +10,15 @@ InputLayout::~InputLayout()
 {
 }
 
-// ¿©±â¼­ ¸¸µå´Â DESC¿Í struct·Î ¸¸µç vertex, HLSLÀÇ VS°¡ ÀüºÎ ¸Â¾Æ¾ßÇÑ´Ù.
-// ÀÌ¹ø¿¡´Â desc¸¦ µû·Î vector·Î ¹Þ¾Ò´Ù. ÀÌÀ¯´Â '¹öÅØ½º¸¶´Ù ¸ðµÎ ±¸¼ºÀÌ ÃµÂ÷¸¸º°ÀÌ±â ¶§¹®'ÀÌ¹Ç·Î. ±×°ÍµéÀ» °¢°¢ ¸ðµÎ ÃæÁ·½ÃÄÑÁÖ±â À§ÇØ¼­ÀÌ´Ù.
-// °Å±â¿¡, ¹è¿­À» ÀÎÀÚ·Î ¹Þ¾ÆºÁ¾ß Æ÷ÀÎÅÍ·Î ³Ñ¾î¿Â´Ù. ±×·¯¹Ç·Î sizeof·Î Å©±â¸¦ ÂüÁ¶ÇÒ ¼ö ¾øÀ¸¹Ç·Î std::vector°¡ ÇÊ¿äÇÏ´Ù. (size °°ÀÌ ³Ñ°ÜÁàµµ µÇ±ä ÇÏ´Âµ¥. ±»ÀÌ?)
+// ì—¬ê¸°ì„œ ë§Œë“œëŠ” DESCì™€ structë¡œ ë§Œë“  vertex, HLSLì˜ VSê°€ ì „ë¶€ ë§žì•„ì•¼í•œë‹¤.
+// ì´ë²ˆì—ëŠ” descë¥¼ ë”°ë¡œ vectorë¡œ ë°›ì•˜ë‹¤. ì´ìœ ëŠ” 'ë²„í…ìŠ¤ë§ˆë‹¤ ëª¨ë‘ êµ¬ì„±ì´ ì²œì°¨ë§Œë³„ì´ê¸° ë•Œë¬¸'ì´ë¯€ë¡œ. ê·¸ê²ƒë“¤ì„ ê°ê° ëª¨ë‘ ì¶©ì¡±ì‹œì¼œì£¼ê¸° ìœ„í•´ì„œì´ë‹¤.
+// ê±°ê¸°ì—, ë°°ì—´ì„ ì¸ìžë¡œ ë°›ì•„ë´ì•¼ í¬ì¸í„°ë¡œ ë„˜ì–´ì˜¨ë‹¤. ê·¸ëŸ¬ë¯€ë¡œ sizeofë¡œ í¬ê¸°ë¥¼ ì°¸ì¡°í•  ìˆ˜ ì—†ìœ¼ë¯€ë¡œ std::vectorê°€ í•„ìš”í•˜ë‹¤. (size ê°™ì´ ë„˜ê²¨ì¤˜ë„ ë˜ê¸´ í•˜ëŠ”ë°. êµ³ì´?)
 void InputLayout::Create(const std::vector<D3D11_INPUT_ELEMENT_DESC>& descs, ComPtr<ID3DBlob> blob)
 {
 	const int32 count = static_cast<int32>(descs.size());
 
-	// InputLayout = "GPU°¡ µ¥ÀÌÅÍ¸¦ ¾î¶»°Ô ÀÐ¾î¾ßÇÒÁö ¾Ë·ÁÁÖ´Â ¹ø¿ª±â"
-	// _vsBlobÀ» ¿Ö ÇÊ¿ä·Î ÇÏ³Ä¸é, ELEMENT_DESC¿Í struct VS_INPUTÀÌ ¼­·Î ÀÏÄ¡ÇÏ³ª '»çÀü °ËÁõ'À» ÇÊ¿ä·Î ÇÔ.
-	_device->CreateInputLayout(descs.data(), count, blob->GetBufferPointer(), blob->GetBufferSize(), _inputLayout.GetAddressOf());
+	// InputLayout = "GPUê°€ ë°ì´í„°ë¥¼ ì–´ë–»ê²Œ ì½ì–´ì•¼í• ì§€ ì•Œë ¤ì£¼ëŠ” ë²ˆì—­ê¸°"
+	// _vsBlobì„ ì™œ í•„ìš”ë¡œ í•˜ëƒë©´, ELEMENT_DESCì™€ struct VS_INPUTì´ ì„œë¡œ ì¼ì¹˜í•˜ë‚˜ 'ì‚¬ì „ ê²€ì¦'ì„ í•„ìš”ë¡œ í•¨.
+	HRESULT hr = _device->CreateInputLayout(descs.data(), count, blob->GetBufferPointer(), blob->GetBufferSize(), _inputLayout.GetAddressOf());
+	assert(SUCCEEDED(hr));
 }

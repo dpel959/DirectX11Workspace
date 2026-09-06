@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 //STL
 #include <vector>
@@ -7,33 +7,33 @@
 #include <unordered_map>
 
 //WIN
-#define WIN32_LEAN_AND_MEAN // ¹«°Å¿î À©µµ¿ì ±â´Éµé Á¦¿Ü
-#define NOMINMAX // std::min, std;:max Ãæµ¹ ¾ø¾Ö±â
+#define WIN32_LEAN_AND_MEAN // ë¬´ê±°ìš´ ìœˆë„ìš° ê¸°ëŠ¥ë“¤ ì œì™¸
+#define NOMINMAX // std::min, std;:max ì¶©ëŒ ì—†ì• ê¸°
 #include <windows.h>
 #include <cassert>
 
 //DX
-#include <d3d11.h>          // DirectX 11 ÇÙ½É ±â´É (ID3D11Device, Context µî)
-#include <d3dcompiler.h>    // ¼ÎÀÌ´õ(HLSL) ÄÚµå¸¦ ÄÄÆÄÀÏÇØ ÁÖ´Â µµ±¸
-#include <wrl.h>            // Microsoft::WRL::ComPtr ½º¸¶Æ® Æ÷ÀÎÅÍ »ç¿ë Àü¿ë!
-#include <DirectXMath.h>    // DirectX Àü¿ë 3D/2D ¼öÇĞ ¶óÀÌºê·¯¸® (Çà·Ä, º¤ÅÍ ¿¬»ê)
-#include <DirectXTex/DirectXTex.h> // PNG, JPG, DDS °°Àº ÀÌ¹ÌÁö ÆÄÀÏ ºÒ·¯¿À´Â ¶óÀÌºê·¯¸®
-#include <DirectXTex/DirectXTex.inl> // C++ ¼Ò½º ÄÚµå. ¶óÀÌºê·¯¸®´Â ¾Æ´Ô. cppÀÎµ¥ ÀÎ¶óÀÎÀÌ°í, #include ¾È ÇÏ¸é ¾È ÀĞÈû.
-// ºÎ·Ï cpp°¡ Á¦ÀÏ ¸Â´Â ¸»ÀÏµí.
+#include <d3d11.h>          // DirectX 11 í•µì‹¬ ê¸°ëŠ¥ (ID3D11Device, Context ë“±)
+#include <d3dcompiler.h>    // ì…°ì´ë”(HLSL) ì½”ë“œë¥¼ ì»´íŒŒì¼í•´ ì£¼ëŠ” ë„êµ¬
+#include <wrl.h>            // Microsoft::WRL::ComPtr ìŠ¤ë§ˆíŠ¸ í¬ì¸í„° ì‚¬ìš© ì „ìš©!
+#include <DirectXMath.h>    // DirectX ì „ìš© 3D/2D ìˆ˜í•™ ë¼ì´ë¸ŒëŸ¬ë¦¬ (í–‰ë ¬, ë²¡í„° ì—°ì‚°)
+#include <DirectXTex/DirectXTex.h> // PNG, JPG, DDS ê°™ì€ ì´ë¯¸ì§€ íŒŒì¼ ë¶ˆëŸ¬ì˜¤ëŠ” ë¼ì´ë¸ŒëŸ¬ë¦¬
+#include <DirectXTex/DirectXTex.inl> // C++ ì†ŒìŠ¤ ì½”ë“œ. ë¼ì´ë¸ŒëŸ¬ë¦¬ëŠ” ì•„ë‹˜. cppì¸ë° ì¸ë¼ì¸ì´ê³ , #include ì•ˆ í•˜ë©´ ì•ˆ ì½í˜.
+// ë¶€ë¡ cppê°€ ì œì¼ ë§ëŠ” ë§ì¼ë“¯.
 
-// °­ÀÇ¿Í Â÷º°Á¡ : using namespace ¿¡¼­ ¹Ù²ãÁáÀ½. ÁÁÁö ¾ÊÀº ½À°üÀÌ¶ó
-// + ¸ğµç °É pch¿¡ ³Ö±âº¸´Ù´Â, ´Ùµé ¾²´Â °Í¸¸ ³Ö±â.
+// ê°•ì˜ì™€ ì°¨ë³„ì  : using namespace ì—ì„œ ë°”ê¿”ì¤¬ìŒ. ì¢‹ì§€ ì•Šì€ ìŠµê´€ì´ë¼
+// + ëª¨ë“  ê±¸ pchì— ë„£ê¸°ë³´ë‹¤ëŠ”, ë‹¤ë“¤ ì“°ëŠ” ê²ƒë§Œ ë„£ê¸°.
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-//ÇÁ·ÎÁ§Æ® ¼³Á¤ÀÌ¶û º°°³·Î ÀÌ Ã¥ ²¨³» ¾µ °Å¾ß ÀÓ. lib´Â ¿¬°áÇÏ·Á¸é ÀÌ ³­¸® ÃÄ¾ß ÇÔ.
-#pragma comment(lib, "d3d11.lib")        // DirectX 11 ±âº» ¶óÀÌºê·¯¸® ¿¬°á. 
-#pragma comment(lib, "d3dcompiler.lib")  // ¼ÎÀÌ´õ ÄÄÆÄÀÏ·¯ ¶óÀÌºê·¯¸® ¿¬°á
+//í”„ë¡œì íŠ¸ ì„¤ì •ì´ë‘ ë³„ê°œë¡œ ì´ ì±… êº¼ë‚´ ì“¸ ê±°ì•¼ ì„. libëŠ” ì—°ê²°í•˜ë ¤ë©´ ì´ ë‚œë¦¬ ì³ì•¼ í•¨.
+#pragma comment(lib, "d3d11.lib")        // DirectX 11 ê¸°ë³¸ ë¼ì´ë¸ŒëŸ¬ë¦¬ ì—°ê²°. 
+#pragma comment(lib, "d3dcompiler.lib")  // ì…°ì´ë” ì»´íŒŒì¼ëŸ¬ ë¼ì´ë¸ŒëŸ¬ë¦¬ ì—°ê²°
 
 #ifdef _DEBUG
-#pragma comment(lib, "DirectXTex\\DirectXTex_debug.lib")  // µğ¹ö±× ¸ğµåÀÏ ¶§´Â µğ¹ö±ë Á¤º¸°¡ µé¾îÀÖ´Â DirectXTex_debug.lib ¿¬°á
+#pragma comment(lib, "DirectXTex\\DirectXTex_debug.lib")  // ë””ë²„ê·¸ ëª¨ë“œì¼ ë•ŒëŠ” ë””ë²„ê¹… ì •ë³´ê°€ ë“¤ì–´ìˆëŠ” DirectXTex_debug.lib ì—°ê²°
 #else 
-#pragma comment(lib, "DirectXTex\\DirectXTex.lib")     // ¸±¸®½º ¸ğµåÀÏ ¶§´Â ÃÖÀûÈ­µÈ DirectXTex.lib ¿¬°á
+#pragma comment(lib, "DirectXTex\\DirectXTex.lib")     // ë¦´ë¦¬ìŠ¤ ëª¨ë“œì¼ ë•ŒëŠ” ìµœì í™”ëœ DirectXTex.lib ì—°ê²°
 #endif
 
 #include "Types.h"

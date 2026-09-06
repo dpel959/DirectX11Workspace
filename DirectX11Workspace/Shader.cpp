@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Shader.h"
 
 Shader::Shader(ComPtr<ID3D11Device> device)
@@ -15,10 +15,10 @@ void Shader::LoadShaderFromFile(const std::wstring& path, const std::string& nam
 	_path = path;
 	_name = name;
 
-	// µð¹ö±× ¸ðµå°í, ÃÖÀûÈ­ °Ç³Ê¶Ù°Ú´Ù.
+	// ë””ë²„ê·¸ ëª¨ë“œê³ , ìµœì í™” ê±´ë„ˆë›°ê² ë‹¤.
 	const uint32 compileFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 
-	//d3dcompilerÀÇ ÇÔ¼öÀÓ. d3d11 ±âº» Á¦°øÀÌ ¾Æ´Ô
+	//d3dcompilerì˜ í•¨ìˆ˜ìž„. d3d11 ê¸°ë³¸ ì œê³µì´ ì•„ë‹˜
 	HRESULT hr = ::D3DCompileFromFile(
 		path.c_str(),
 		nullptr,
@@ -43,15 +43,15 @@ VertexShader::~VertexShader()
 {
 }
 
-// ÆÄÀÏ·Î Á¸ÀçÇÏ´ø ¼ÎÀÌ´õ¸¦, ¸Þ¸ð¸®¿¡ µé°í µ¿ÀÛÀ» ½ÃÅ²´Ù
-// µü Èå¸§À» Á¤¸®ÇÏÀÚ¸é, InputLayout¿¡¼­ ELEMENT_DESC »ý¼º(C++) -> HLSL Â¥±â -> C++·Î µ¹¾Æ¿Í D3DCompileFromFile·Î HLSL ·Îµå
-// -> BlobÀ¸·Î ¼ÎÀÌ´õ ÆÄÀÏ ·Îµå, BlobÀ» ÅëÇØ ¼ÎÀÌ´õ¸¦ C++¿¡¼­ »ý¼º -> ´Ù½Ã InputLayoutÀ¸·Î ¿Í CreateInputLayout
+// íŒŒì¼ë¡œ ì¡´ìž¬í•˜ë˜ ì…°ì´ë”ë¥¼, ë©”ëª¨ë¦¬ì— ë“¤ê³  ë™ìž‘ì„ ì‹œí‚¨ë‹¤
+// ë”± íë¦„ì„ ì •ë¦¬í•˜ìžë©´, InputLayoutì—ì„œ ELEMENT_DESC ìƒì„±(C++) -> HLSL ì§œê¸° -> C++ë¡œ ëŒì•„ì™€ D3DCompileFromFileë¡œ HLSL ë¡œë“œ
+// -> Blobìœ¼ë¡œ ì…°ì´ë” íŒŒì¼ ë¡œë“œ, Blobì„ í†µí•´ ì…°ì´ë”ë¥¼ C++ì—ì„œ ìƒì„± -> ë‹¤ì‹œ InputLayoutìœ¼ë¡œ ì™€ CreateInputLayout
 void VertexShader::Create(const std::wstring& path, const std::string& name, const std::string& version)
 {
-	// ÆÄÀÏ¿¡¼­ ¼ÎÀÌ´õ Á¤º¸¸¦ blobÀ¸·Î ²ø¾î¿Â´Ù!
-	LoadShaderFromFile(path, name, version); // ¼ÎÀÌ´õ ÀÌ¸§, ¼ÎÀÌ´õ Á¾·ù, ¼ÎÀÌ´õ ¹öÀü, ¹ÞÀ» ºí·Ó
+	// íŒŒì¼ì—ì„œ ì…°ì´ë” ì •ë³´ë¥¼ blobìœ¼ë¡œ ëŒì–´ì˜¨ë‹¤!
+	LoadShaderFromFile(path, name, version); // ì…°ì´ë” ì´ë¦„, ì…°ì´ë” ì¢…ë¥˜, ì…°ì´ë” ë²„ì „, ë°›ì„ ë¸”ë¡­
 
-	// blobÀ» ÅëÇØ ¹öÅØ½º ¼ÎÀÌ´õ¸¦ ¸¸µç´Ù! ±»ÀÌ blobÀ» °ÅÃÄ¼­ ¸¸µå´Â ÀÌÀ¯´Â, ³ªÁß¿¡ InputLayoutÀ» ¸¸µé¶§µµ blobÀÌ ÇÊ¿äÇÏ±â ¶§¹®. (°ËÁõ¿ë)
+	// blobì„ í†µí•´ ë²„í…ìŠ¤ ì…°ì´ë”ë¥¼ ë§Œë“ ë‹¤! êµ³ì´ blobì„ ê±°ì³ì„œ ë§Œë“œëŠ” ì´ìœ ëŠ”, ë‚˜ì¤‘ì— InputLayoutì„ ë§Œë“¤ë•Œë„ blobì´ í•„ìš”í•˜ê¸° ë•Œë¬¸. (ê²€ì¦ìš©)
 	HRESULT hr = _device->CreateVertexShader(_blob->GetBufferPointer(),
 		_blob->GetBufferSize(), nullptr, _vertexShader.GetAddressOf());
 

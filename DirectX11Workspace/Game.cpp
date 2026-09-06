@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Game.h"
 #include <climits>
 #include "Graphics.h"
@@ -34,27 +34,26 @@ void Game::Init(HWND hwnd)
 	_parentObject = std::make_shared<GameObject>(device, deviceContext);
 	_childObject = std::make_shared<GameObject>(device, deviceContext);
 
-	_parentObject->_transform->AddChild(_childObject->_transform);
 	_childObject->_transform->SetParent(_parentObject->_transform);
 
 }
 
 void Game::Update()
 {
-	// ÀÌ°É ¸ğµç gameObject¿¡ ´ëÇØ ½ÇÇàÇØ¾ßÇÒ °Í.
+	// ì´ê±¸ ëª¨ë“  gameObjectì— ëŒ€í•´ ì‹¤í–‰í•´ì•¼í•  ê²ƒ.
 	_parentObject->Update(true);
 	_childObject->Update(false);
 }
 
 void Game::Render()
 {
-	_graphics->RenderBegin(); // ÁØºñ ÀÛ¾÷. µµÈ­Áö ÃÊ±âÈ­ µî.
+	_graphics->RenderBegin(); // ì¤€ë¹„ ì‘ì—…. ë„í™”ì§€ ì´ˆê¸°í™” ë“±.
 
-	// ½ÇÁ¦ ±×¸®´Â ÀÛ¾÷.
+	// ì‹¤ì œ ê·¸ë¦¬ëŠ” ì‘ì—….
 	// IA - VS - RS - PS - OM
 
 	_parentObject->Render(_pipeline);
 	_childObject->Render(_pipeline);
 
-	_graphics->RenderEnd(); // ´Ù ±×·ÈÀ¸´Ï Á¦Ãâ. ÀÌ·± Èå¸§
+	_graphics->RenderEnd(); // ë‹¤ ê·¸ë ¸ìœ¼ë‹ˆ ì œì¶œ. ì´ëŸ° íë¦„
 }

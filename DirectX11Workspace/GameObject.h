@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <memory>
 #include "Geometry.h"
 #include "VertexData.h"
@@ -28,8 +28,8 @@ public:
 private:
 	ComPtr<ID3D11Device> _device;
 
-	// Geometry. µµÇü = Mesh ¸¸µé±â.
-	// Geometry´Â ¸®¼Ò½ºÀÌ´Ù. °¢ '°´Ã¼'°¡ ¾Æ´Ñ, '¸®¼Ò½º'(¸Ş½¬) ´ÜÀ§·Î ÇÏ³ª¾¿ µé°í ÀÖÀ¸¸é µÇ´Â °Í.
+	// Geometry. ë„í˜• = Mesh ë§Œë“¤ê¸°.
+	// GeometryëŠ” ë¦¬ì†ŒìŠ¤ì´ë‹¤. ê° 'ê°ì²´'ê°€ ì•„ë‹Œ, 'ë¦¬ì†ŒìŠ¤'(ë©”ì‰¬) ë‹¨ìœ„ë¡œ í•˜ë‚˜ì”© ë“¤ê³  ìˆìœ¼ë©´ ë˜ëŠ” ê²ƒ.
 	std::shared_ptr<Geometry<VertexTextureData>> _geometry;
 	// 	std::shared_ptr<Geometry<VertexColorData>> _geometry;
 	std::shared_ptr<VertexBuffer> _vertexBuffer;
@@ -50,8 +50,8 @@ private:
 	std::shared_ptr<SamplerState> _samplerState;
 	std::shared_ptr<BlendState> _blendState;
 
-	// --- ¿©±â 'À§'´Â '¸®¼Ò½º' ¸¶´Ù °°Àº ºÎºĞ.
-	// --- ¿©±â '¹Ø'Àº '¿ÀºêÁ§Æ®' ¸¶´Ù ´Ù¸¥ ºÎºĞ.
+	// --- ì—¬ê¸° 'ìœ„'ëŠ” 'ë¦¬ì†ŒìŠ¤' ë§ˆë‹¤ ê°™ì€ ë¶€ë¶„.
+	// --- ì—¬ê¸° 'ë°‘'ì€ 'ì˜¤ë¸Œì íŠ¸' ë§ˆë‹¤ ë‹¤ë¥¸ ë¶€ë¶„.
 	
 	// constant buffer
 	TransformData _transformData;
