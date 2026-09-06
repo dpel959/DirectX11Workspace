@@ -269,3 +269,10 @@ Shader와 Texture를 상대 경로로 불러오므로 Visual Studio에서 프로
 - 창 크기 변경에 따른 SwapChain 및 Viewport 재설정
 - Depth Buffer와 Camera 구현
 - Component 소유 관계 및 관리 기능 확장
+
+### Asset Credits
+
+Skeleton.png, Golem.png 이미지는 OpenGameArt의 공개 에셋을 사용했습니다.
+
+- UndeadFighter — BlackSwordo, OpenGameArt, CC BY 3.0
+- Cursed Lava Golem Knight — VoyPix, OpenGameArt, CC BY 3.0
