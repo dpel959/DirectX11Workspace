@@ -1,11 +1,16 @@
 ﻿#pragma once
+#include <cassert>
+#include <d3d11.h>
+#include <vector>
+#include <wrl/client.h>
+#include "Types.h"
 class VertexBuffer
 {
 public:
-	VertexBuffer(ComPtr<ID3D11Device> device);
+	VertexBuffer(Microsoft::WRL::ComPtr<ID3D11Device> device);
 	~VertexBuffer();
 
-	const ComPtr<ID3D11Buffer>& GetComPtr() const { return _vertexBuffer; }
+	const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetComPtr() const { return _vertexBuffer; }
 	uint32 GetStride() const { return _stride; }
 	uint32 GetOffset() const { return _offset; }
 	uint32 GetCount() const { return _count; }
@@ -45,8 +50,8 @@ public:
 	}
 
 private:
-	ComPtr<ID3D11Device> _device; // 참조용! 물론 싱글톤으로 만들어놔도 됨.
-	ComPtr<ID3D11Buffer> _vertexBuffer; // 이제 GPU의 VRAM으로 넘겨주는 거임.
+	Microsoft::WRL::ComPtr<ID3D11Device> _device; // 참조용! 물론 싱글톤으로 만들어놔도 됨.
+	Microsoft::WRL::ComPtr<ID3D11Buffer> _vertexBuffer; // 이제 GPU의 VRAM으로 넘겨주는 거임.
 
 	// 이건 나중에도 공통적으로 사용해서, 저장해주자
 	uint32 _stride = 0;

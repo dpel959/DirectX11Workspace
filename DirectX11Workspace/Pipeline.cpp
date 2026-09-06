@@ -1,9 +1,12 @@
 ﻿#include "pch.h"
 #include "Pipeline.h"
+#include "InputLayout.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 #include "RasterizerState.h"
 #include "BlendState.h"
 
-Pipeline::Pipeline(ComPtr<ID3D11DeviceContext> _deviceContext)
+Pipeline::Pipeline(Microsoft::WRL::ComPtr<ID3D11DeviceContext> _deviceContext)
 	:_deviceContext(_deviceContext)
 {
 }

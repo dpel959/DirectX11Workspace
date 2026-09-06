@@ -121,7 +121,7 @@ void Transform::SetRotation(const Quaternion& worldRotation)
 {
 	if (const std::shared_ptr<Transform> parent = _parent.lock())
 	{
-		Quaternion invParentRot = XMQuaternionInverse(parent->GetRotation()); // 쿼터니언은 날먹이 된다.
+		Quaternion invParentRot = DirectX::XMQuaternionInverse(parent->GetRotation()); // 쿼터니언은 날먹이 된다.
 		SetLocalRotation(worldRotation * invParentRot);
 	}
 	else

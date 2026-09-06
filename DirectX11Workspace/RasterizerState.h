@@ -1,15 +1,17 @@
 ﻿#pragma once
+#include <d3d11.h>
+#include <wrl/client.h>
 class RasterizerState
 {
 public:
-	RasterizerState(ComPtr<ID3D11Device> device);
+	RasterizerState(Microsoft::WRL::ComPtr<ID3D11Device> device);
 	~RasterizerState();
 
-	const ComPtr<ID3D11RasterizerState>& GetComPtr() const { return _rasterizerState; }
+	const Microsoft::WRL::ComPtr<ID3D11RasterizerState>& GetComPtr() const { return _rasterizerState; }
 
 	void Create();
 
 private:
-	ComPtr<ID3D11Device> _device;
-	ComPtr<ID3D11RasterizerState> _rasterizerState;
+	Microsoft::WRL::ComPtr<ID3D11Device> _device;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> _rasterizerState;
 };

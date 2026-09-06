@@ -1,7 +1,8 @@
 ﻿#include "pch.h"
 #include "SamplerState.h"
+#include <limits>
 
-SamplerState::SamplerState(ComPtr<ID3D11Device> device)
+SamplerState::SamplerState(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:_device(device)
 {
 }

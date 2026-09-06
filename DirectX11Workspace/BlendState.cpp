@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "BlendState.h"
 
-BlendState::BlendState(ComPtr<ID3D11Device> device)
+BlendState::BlendState(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:_device(device)
 {
 }

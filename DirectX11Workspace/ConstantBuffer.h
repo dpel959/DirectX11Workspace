@@ -1,4 +1,8 @@
 ﻿#pragma once
+#include <cassert>
+#include <cstring>
+#include <d3d11.h>
+#include <wrl/client.h>
 
 // ConstantBuffer은 VertexShader에 쓰일때가 많지만, 꼭 그런 것은 아니다. CB도 PS에서 쓸 때가 있고, 텍스처도 VS에서 쓸 때가 있다.
 
@@ -9,7 +13,7 @@ template<typename T>
 class ConstantBuffer
 {
 public:
-	ConstantBuffer(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext)
+	ConstantBuffer(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
 		: _device(device)
 		, _deviceContext(deviceContext)
 	{
@@ -18,7 +22,7 @@ public:
 	
 	~ConstantBuffer() {};
 
-	const ComPtr<ID3D11Buffer>& GetComPtr() const { return _constantBuffer; }
+	const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetComPtr() const { return _constantBuffer; }
 
 	void Create()
 	{
@@ -56,7 +60,7 @@ public:
 
 private:
 
-	ComPtr<ID3D11Device> _device;
-	ComPtr<ID3D11DeviceContext> _deviceContext; //  SubResource를 다루어주기 위해 필요하다.
-	ComPtr<ID3D11Buffer> _constantBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Device> _device;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> _deviceContext; //  SubResource를 다루어주기 위해 필요하다.
+	Microsoft::WRL::ComPtr<ID3D11Buffer> _constantBuffer;
 };

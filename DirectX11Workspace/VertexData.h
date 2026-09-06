@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include <d3d11.h>
+#include <vector>
+#include "Types.h"
 
 // 사실 이렇게 Position, UV 들고 있는 것은 VertexTextureData라고 한다.
 struct VertexTextureData

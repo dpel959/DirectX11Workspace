@@ -1,19 +1,10 @@
 ﻿#pragma once
-#include <string>
 #include <memory>
-#include "Geometry.h"
-#include "VertexData.h"
-#include "ConstantBuffer.h"
-#include "GameObject.h"
+#include <windows.h>
 
+class Graphics;
 class Pipeline;
-
-class VertexShader;
-class PixelShader;
-class Texture;
-class RasterizerState;
-class SamplerState;
-class BlendState;
+class GameObject;
 
 class Game
 {

@@ -1,5 +1,8 @@
 ﻿#pragma once
+#include <memory>
+#include <vector>
 #include "Component.h"
+#include "Types.h"
 
 // std::enable_shared_from_this<T>는 자기 자신을 가리키는 shared_ptr을 호출하는 shared_from_this()를 호출할 수 있게 하기 위함
 // 내부에서 부모 혹은 자식의 shared_ptr은 가질 수 있지만, 자기 자신이 shared_ptr로 관리된다고 해도, 그것을 내가 접근해서 호출할 수는 없다.

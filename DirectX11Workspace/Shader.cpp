@@ -1,7 +1,9 @@
 ﻿#include "pch.h"
 #include "Shader.h"
+#include "Types.h"
+#include <d3dcompiler.h>
 
-Shader::Shader(ComPtr<ID3D11Device> device)
+Shader::Shader(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:_device(device)
 {
 }
@@ -34,7 +36,7 @@ void Shader::LoadShaderFromFile(const std::wstring& path, const std::string& nam
 	assert(SUCCEEDED(hr));
 }
 
-VertexShader::VertexShader(ComPtr<ID3D11Device> device)
+VertexShader::VertexShader(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:Super(device)
 {
 }
@@ -58,7 +60,7 @@ void VertexShader::Create(const std::wstring& path, const std::string& name, con
 	assert(SUCCEEDED(hr));
 }
 
-PixelShader::PixelShader(ComPtr<ID3D11Device> device)
+PixelShader::PixelShader(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:Super(device)
 {
 }

@@ -1,10 +1,18 @@
 ﻿#pragma once
+#include <d3d11.h>
 #include <memory>
+#include <vector>
+#include <wrl/client.h>
 #include "Geometry.h"
 #include "VertexData.h"
 #include "ConstantBuffer.h"
+#include "Struct.h"
+#include "Transform.h"
 
 class Pipeline;
+class VertexBuffer;
+class IndexBuffer;
+class InputLayout;
 
 class VertexShader;
 class PixelShader;
@@ -18,7 +26,7 @@ class Transform;
 class GameObject
 {
 public:
-	GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext);
+	GameObject(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
 	~GameObject();
 
 	void Update(bool isParent);
@@ -26,7 +34,7 @@ public:
 	void Render(std::shared_ptr<Pipeline> pipeline);
 
 private:
-	ComPtr<ID3D11Device> _device;
+	Microsoft::WRL::ComPtr<ID3D11Device> _device;
 
 	// Geometry. 도형 = Mesh 만들기.
 	// Geometry는 리소스이다. 각 '객체'가 아닌, '리소스'(메쉬) 단위로 하나씩 들고 있으면 되는 것.

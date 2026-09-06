@@ -1,9 +1,12 @@
 ﻿#pragma once
+#include <d3d11.h>
 #include <memory>
+#include <wrl/client.h>
 #include "ConstantBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "SamplerState.h"
+#include "Types.h"
 
 // 굳이 렌더링 파이프라인을 클래스로 분리하는 이유는, 필요마다 렌더링을 다르게 해주기 위해서이다.
 // 즉, 물체마다의 '나는 이러한 버퍼, 쉐이더, 텍스처의 고유 설정으로 그려지고 싶어요' 의 정보.
@@ -18,6 +21,8 @@ class VertexShader;
 class RasterizerState;
 class PixelShader;
 class BlendState;
+class VertexBuffer;
+class IndexBuffer;
 
 // 무조건적으로 사용하는 공용 자원들을 PipelineInfo에 들고 있는다.
 
@@ -34,7 +39,7 @@ struct PipelineInfo
 class Pipeline
 {
 public:
-	Pipeline(ComPtr<ID3D11DeviceContext> _deviceContext);
+	Pipeline(Microsoft::WRL::ComPtr<ID3D11DeviceContext> _deviceContext);
 	~Pipeline();
 
 	void UpdatePipeline(PipelineInfo info);
@@ -97,6 +102,6 @@ public:
 	}
 
 private:
-	ComPtr<ID3D11DeviceContext> _deviceContext;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> _deviceContext;
 };
 

@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "RasterizerState.h"
 
-RasterizerState::RasterizerState(ComPtr<ID3D11Device> device)
+RasterizerState::RasterizerState(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:_device(device)
 {
 }

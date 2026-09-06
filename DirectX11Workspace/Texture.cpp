@@ -1,7 +1,8 @@
 ﻿#include "pch.h"
 #include "Texture.h"
+#include <DirectXTex/DirectXTex.h>
 
-Texture::Texture(ComPtr<ID3D11Device> device)
+Texture::Texture(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:_device(device)
 {
 }
@@ -19,11 +20,11 @@ void Texture::Create(const std::wstring& path)
 	DirectX::TexMetadata md; // width, height, detph 등 이미지의 스펙 정보
 	DirectX::ScratchImage img; // 실제 픽셀 알맹이(바이트 배열) 정보
 
-	HRESULT hr = ::LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, &md, img);
+	HRESULT hr = DirectX::LoadFromWICFile(path.c_str(), DirectX::WIC_FLAGS_NONE, &md, img);
 
 	assert(SUCCEEDED(hr));
 
-	hr = CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
+	hr = DirectX::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
 
 	assert(SUCCEEDED(hr));
 }

@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "IndexBuffer.h"
 
-IndexBuffer::IndexBuffer(ComPtr<ID3D11Device> device)
+IndexBuffer::IndexBuffer(Microsoft::WRL::ComPtr<ID3D11Device> device)
 	:_device(device)
 {
 }

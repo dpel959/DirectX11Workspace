@@ -109,7 +109,7 @@ void Graphics::CreateRenderTargetView()
 {
 	HRESULT hr;
 
-	ComPtr<ID3D11Texture2D> backBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer = nullptr;
 	// ComPtr은 -> 가 오버로딩 되어있음. 스마트 포인터처럼 사용하면 됨
 	hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
 		reinterpret_cast<void**>(backBuffer.GetAddressOf()));

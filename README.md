@@ -18,6 +18,67 @@ CPU에서 만든 데이터가 **어떤 과정을 거쳐 GPU와 화면으로 전�
 
 이 프로젝트는 범용 게임 엔진 제작보다, DirectX 11의 기반 개념을 **직접 구현하고 설명할 수 있는 상태로 만드는 것**을 목표로 했습니다.
 
+## 강의 기반과 차별화
+
+이 프로젝트는 온라인 DirectX 11 강의를 기반으로 기본 렌더링 흐름을 학습하며 시작했습니다.
+
+강의 내용을 그대로 재현하는 데서 끝내지 않고, 학습 중 생긴 질문을 주석으로 정리하고 구조와 API 사용을 다시 검토했습니다. 그 과정에서 다음 부분을 별도로 확장하거나 개선했습니다.
+
+- GPU 리소스와 렌더링 단계를 역할별 클래스로 분리
+- `PipelineInfo`로 공통 렌더 상태를 묶고 선택적 리소스 바인딩을 분리
+- `enum class` 기반 `ShaderScope`와 비트 플래그 연산 지원
+- `GameObject`와 `Transform` 구조 도입
+- Local/World SRT 계산 및 부모-자식 Transform 계층 구현
+- 부모 변경 시 양방향 관계와 하위 World Transform을 한 번에 갱신하도록 `SetParent` 개선
+- 부모를 `weak_ptr`로 관리해 Transform 순환 참조 제거
+- PCH를 안정적인 공용 헤더 중심으로 정리하고 헤더 의존성을 명시적으로 분리
+- 광범위한 `using namespace`를 제거하고 DirectX/WRL 타입의 소속을 명시
+- Pipeline 인자, Shader Scope, Sampler Filter, Blend Factor, Input Semantic 오류 검토 및 수정
+- HLSL과 C++ 파일의 UTF-8/줄 끝 문제를 분석하고 한글 주석과 빌드를 모두 유지
+
+### Scoped Enum과 Shader Scope
+
+강의 코드와 달리 Shader 적용 범위를 `enum class`로 표현했습니다. 일반 `enum`처럼 열거자 이름이 전역 범위에 노출되는 것을 피하면서, 암시적인 정수 변환도 제한하기 위한 선택입니다.
+
+```cpp
+enum class ShaderScope
+{
+    None         = 0,
+    VertexShader = (1 << 0),
+    PixelShader  = (1 << 1),
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(ShaderScope);
+```
+
+`enum class`는 기본적으로 비트 연산자를 제공하지 않으므로 `DEFINE_ENUM_FLAG_OPERATORS`로 연산을 지원했습니다. 이를 통해 하나의 값에 여러 Shader Stage를 함께 표현할 수 있습니다.
+
+```cpp
+ShaderScope scope =
+    ShaderScope::VertexShader | ShaderScope::PixelShader;
+```
+
+Pipeline에서는 각 비트를 독립된 `if`로 검사해 VS와 PS가 동시에 지정된 경우 두 Stage에 모두 리소스를 바인딩합니다.
+
+관련 코드: [Shader.h](./DirectX11Workspace/Shader.h), [Pipeline.h](./DirectX11Workspace/Pipeline.h)
+
+### PCH와 헤더 의존성 정리
+
+PCH를 프로젝트 전체 include 목록처럼 사용하지 않고, 여러 번 사용되며 변경이 적은 Windows/DirectX 및 표준 라이브러리 헤더만 보관하도록 정리했습니다.
+
+- 사용하지 않는 `list`, `map`, `unordered_map` 제거
+- `Graphics`, `VertexBuffer`, `IndexBuffer`, `InputLayout` 등 프로젝트 클래스 제거
+- Texture 구현에서만 필요한 DirectXTex를 `Texture.cpp`로 이동
+- Shader 구현에서만 필요한 D3DCompiler를 `Shader.cpp`로 이동
+- 각 헤더가 사용하는 타입을 직접 include하거나 전방 선언
+- `using namespace DirectX`, `using namespace Microsoft::WRL` 제거
+- `Microsoft::WRL::ComPtr`, `DirectX::XMQuaternionInverse`처럼 타입과 함수의 소속 명시
+- 라이브러리 링크 설정을 PCH에서 Visual Studio 프로젝트 설정으로 이동
+
+이를 통해 PCH는 컴파일 비용을 줄이는 캐시 역할만 담당하고, 각 파일의 실제 의존성은 코드에서 확인할 수 있도록 했습니다.
+
+관련 코드: [pch.h](./DirectX11Workspace/pch.h), [Texture.cpp](./DirectX11Workspace/Texture.cpp), [Shader.cpp](./DirectX11Workspace/Shader.cpp)
+
 ## 실행 결과
 
 - Index Buffer를 이용한 텍스처 사각형 렌더링
@@ -168,6 +229,7 @@ Input Layout, Shader Resource, Sampler, Constant Buffer가 각각 어떤 레지�
 - 일반 색상 샘플링에 Comparison Filter를 사용하던 문제 수정
 - Blend Factor를 API가 요구하는 RGBA 4개 값으로 수정
 - Vertex Color Input Layout의 Semantic 불일치 수정
+- 불필요한 PCH 의존성과 전역 namespace 오염 제거
 
 이 과정을 통해 API를 호출하는 것뿐 아니라, **API가 요구하는 데이터 형식과 객체 소유 관계, 상태 변경의 일관성까지 검토하는 경험**을 얻었습니다.
 

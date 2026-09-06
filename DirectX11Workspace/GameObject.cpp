@@ -1,5 +1,8 @@
 ﻿#include "pch.h"
 #include "GameObject.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "InputLayout.h"
 #include "GeometryHelper.h"
 #include "Shader.h"
 #include "RasterizerState.h"
@@ -9,7 +12,7 @@
 #include "Pipeline.h"
 #include "Transform.h"
 
-GameObject::GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext)
+GameObject::GameObject(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
 	:_device(device)
 {
 	//--- 기하(도형) 만들기
