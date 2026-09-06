@@ -20,21 +20,16 @@ CPU에서 만든 데이터가 **어떤 과정을 거쳐 GPU와 화면으로 전�
 
 ## 강의 기반과 차별화
 
-이 프로젝트는 인프런 Rookiss님의 「[게임 프로그래머 도약반] DirectX11 입문」 강의를 기반으로 기본 렌더링 흐름을 학습하며 시작했습니다.
+이 프로젝트는 인프런 - Rookiss님의 「[게임 프로그래머 도약반] DirectX11 입문」 강의를 기반으로 기본 렌더링 흐름을 학습하며 시작했습니다.
 
 강의 내용을 그대로 재현하는 데서 끝내지 않고, 학습 중 생긴 질문을 주석으로 정리하고 구조와 API 사용을 다시 검토했습니다. 그 과정에서 다음 부분을 별도로 확장하거나 개선했습니다.
 
-- GPU 리소스와 렌더링 단계를 역할별 클래스로 분리
-- `PipelineInfo`로 공통 렌더 상태를 묶고 선택적 리소스 바인딩을 분리
 - `enum class` 기반 `ShaderScope`와 비트 플래그 연산 지원
-- `GameObject`와 `Transform` 구조 도입
-- Local/World SRT 계산 및 부모-자식 Transform 계층 구현
 - 부모 변경 시 양방향 관계와 하위 World Transform을 한 번에 갱신하도록 `SetParent` 개선
 - 부모를 `weak_ptr`로 관리해 Transform 순환 참조 제거
 - PCH를 안정적인 공용 헤더 중심으로 정리하고 헤더 의존성을 명시적으로 분리
 - 광범위한 `using namespace`를 제거하고 DirectX/WRL 타입의 소속을 명시
-- Pipeline 인자, Shader Scope, Sampler Filter, Blend Factor, Input Semantic 오류 검토 및 수정
-- HLSL과 C++ 파일의 UTF-8/줄 끝 문제를 분석하고 한글 주석과 빌드를 모두 유지
+- Sampler Filter, 읽기 전용 함수의 const 검토 및 Blend Factor 오류 검토 및 수정
 
 ### Scoped Enum과 Shader Scope
 
@@ -87,7 +82,13 @@ PCH를 프로젝트 전체 include 목록처럼 사용하지 않고, 여러 번 
 - 자식 오브젝트 회전
 - 부모 Transform 변경에 따른 자식 World Transform 재계산
 
-> 실행 화면 GIF를 추가하면 렌더링 결과와 부모-자식 움직임을 가장 빠르게 보여줄 수 있습니다.
+<img width="640" height="480" alt="Adobe Express - Video" src="https://github.com/user-attachments/assets/680fecda-820e-4e09-a0ca-848ca9645f51" />
+
+- 확장된 UV 좌표와 Sampler를 이용한 텍스처 반복
+- 부모 이동에 따른 자식 World Position 갱신
+- 부모의 Transform을 상속하면서 자식의 Local Rotation 유지
+
+를 확인할 수 있습니다.
 
 ## 주요 구현
 
@@ -175,7 +176,7 @@ flowchart LR
 
 ## 주석으로 남긴 학습 기록
 
-이 프로젝트에서 주석은 코드의 동작을 다시 읽어주는 설명보다, 학습 중 생긴 **“왜?”에 대한 답**을 기록하는 데 사용했습니다.
+이 프로젝트에서 주석은 코드의 동작을 다시 읽어주는 설명보다, 제가 학습하는 중 생긴 **“왜?”에 대한 답**을 기록하는 데 사용했습니다.
 
 ### Resource와 View의 관계
 
@@ -234,13 +235,10 @@ README에서는 대표적인 주제만 추렸습니다. 아래 파일에도 구�
 
 ## 학습 중 발견하고 수정한 문제
 
-- HLSL의 UTF-8 BOM으로 인한 `fxc` 컴파일 오류를 확인하고 UTF-8 without BOM으로 변경
-- 부모와 자식 Transform이 서로를 `shared_ptr`로 소유하던 순환 참조 제거
-- `ShaderScope`에 VS와 PS가 함께 지정될 때 `else if` 때문에 한쪽만 바인딩되던 문제 수정
-- Pipeline에 전달한 Primitive Topology와 Sampler Slot이 무시되던 문제 수정
+- 부모와 자식 Transform이 서로를 `shared_ptr`로 소유하던 순환 참조를 `weak_ptr`과 `enable_shared_from_this`클래스의 상속을 통해 제거
 - 일반 색상 샘플링에 Comparison Filter를 사용하던 문제 수정
 - Blend Factor를 API가 요구하는 RGBA 4개 값으로 수정
-- Vertex Color Input Layout의 Semantic 불일치 수정
+- 객체를 변경하지 않는 함수들에 대해 const 한정자를 적용
 - 불필요한 PCH 의존성과 전역 namespace 오염 제거
 
 이 과정을 통해 API를 호출하는 것뿐 아니라, **API가 요구하는 데이터 형식과 객체 소유 관계, 상태 변경의 일관성까지 검토하는 경험**을 얻었습니다.
@@ -264,11 +262,17 @@ README에서는 대표적인 주제만 추렸습니다. 아래 파일에도 구�
 
 Shader와 Texture를 상대 경로로 불러오므로 Visual Studio에서 프로젝트 디렉터리를 작업 경로로 실행해야 합니다.
 
-## 앞으로 개선할 점
+## 앞으로 개선/구현해나갈 점
 
 - Delta Time 기반 Transform 갱신
-- Mesh, Material, Shader 리소스 공유
+- Mesh, Material, Shader 리소스 응용
 - 창 크기 변경에 따른 SwapChain 및 Viewport 재설정
 - Depth Buffer와 Camera 구현
 - Component 소유 관계 및 관리 기능 확장
-- DirectX Debug Layer와 오류 처리 강화
+
+### Asset Credits
+
+Skeleton.png, Golem.png 이미지는 OpenGameArt의 공개 에셋을 사용했습니다.
+
+- UndeadFighter — BlackSwordo, OpenGameArt, CC BY 3.0
+- Cursed Lava Golem Knight — VoyPix, OpenGameArt, CC BY 3.0
